@@ -1,0 +1,21 @@
+// Keep the existing admin scale scoped to this feature without modifying shared UI components.
+export const contentManagementClassName = [
+  "flex min-w-0 flex-col gap-5 text-admin-15 leading-normal",
+  "[&_[data-slot=button]]:min-h-10 [&_[data-slot=button]]:px-4! [&_[data-slot=button]]:text-admin-15!",
+  "[&_[data-slot=select-trigger]]:min-h-10 [&_[data-slot=select-trigger]]:text-admin-15!",
+  "[&_[data-slot=input]]:h-10!",
+  "[&_[data-slot=table]]:text-admin-15!",
+  "[&_[data-slot=table-header]]:bg-muted",
+  "[&_[data-slot=table-head]]:h-11! [&_[data-slot=table-head]]:px-4! [&_[data-slot=table-head]]:text-primary! [&_[data-slot=table-head]]:text-admin-15! [&_[data-slot=table-head]]:font-semibold!",
+  "[&_[data-slot=table-cell]]:p-4!",
+  "[&_[data-slot=badge]]:h-auto! [&_[data-slot=badge]]:rounded-lg! [&_[data-slot=badge]]:px-2! [&_[data-slot=badge]]:py-1! [&_[data-slot=badge]]:text-admin-14!",
+  "[&_[data-slot=card]]:[--card-spacing:16px]! [&_[data-slot=card]]:text-admin-15! [&_[data-slot=card]]:border [&_[data-slot=card]]:border-border [&_[data-slot=card]]:shadow-none",
+  "[&_[data-slot=card-title]]:text-primary! [&_[data-slot=card-title]]:text-admin-18! [&_[data-slot=card-title]]:font-semibold!",
+  "[&_[data-slot=field-label]]:text-admin-15! [&_[data-slot=field-label]]:font-semibold!",
+  "[&_[data-slot=card-description]]:text-admin-14! [&_[data-slot=card-description]]:leading-[1.6]!",
+  "[&_[data-slot=field-description]]:text-admin-14! [&_[data-slot=field-description]]:leading-[1.6]!",
+  "[&_[data-slot=field-error]]:text-admin-14! [&_[data-slot=field-error]]:leading-[1.6]!",
+  "[&_[data-slot=alert-title]]:text-admin-14! [&_[data-slot=alert-title]]:leading-[1.6]!",
+  "[&_[data-slot=alert-description]]:text-admin-14! [&_[data-slot=alert-description]]:leading-[1.6]!",
+  "sm:[&_[data-slot=card]]:[--card-spacing:24px]! [&_[data-slot=table-body]>tr:nth-child(even)]:bg-muted",
+].join(" ");

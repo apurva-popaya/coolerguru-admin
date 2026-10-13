@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CoolerGuru Admin
 
-## Getting Started
+Standalone extraction of the CoolerGuru admin portal. Existing UI wrappers,
+styles, features, and backend contracts are preserved.
 
-First, run the development server:
+Production: https://admin.coolerguru.com. Local: http://localhost:3001.
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For production run `npm run build` and `npm start`. A Next.js Node server is
+required; static export is unsupported. Dev/start default to port 3001.
+Route the production hostname to this server and enable HTTPS.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Overview is `/`; login is `/login`. Screens use root paths such as `/companies`,
+`/products`, `/users`, and `/content-management`. Register/add-admin require an
+authenticated ADMIN role. Registration is an existing placeholder; use `/add-admin`
+to create administrators through `/admin/accounts`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment and deployment
 
-## Learn More
+- `NEXT_PUBLIC_API_BASE_URL`: existing backend API base including `/api/v1`.
+  Local default is `http://localhost:8000/api/v1`. The Next.js server must reach it.
+  This is public configuration; never include credentials.
+- `IMAGE_REMOTE_HOSTS`: comma-separated HTTPS upload/CDN hostnames if files are
+  outside `*.coolerguru.com`. The single `next.config.mjs` preserves existing hosts.
 
-To learn more about Next.js, take a look at the following resources:
+Browser auth, data, uploads, and exports use `/api/admin-backend`. The bridge
+forwards only admin cookies, forces `X-Auth-Portal: ADMIN`, and preserves backend
+`/admin` paths. Rotated cookies belong to the admin frontend host and `/` path.
+Proxy refreshes also update incoming cookies for Server Components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Keep the existing backend/database. Auth must support ADMIN sessions and roles,
+`/auth/me` rotation, `/auth/refresh`, `/auth/logout`, `/auth/admin/login`, and
+authorized `/admin/accounts` creation. If backend origin, CSRF, redirect, or host
+allowlists exist, include `https://admin.coolerguru.com` and `http://localhost:3001`.
+Browser API CORS is avoided by the same-origin bridge; server connectivity is required.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Preserve `Set-Cookie` headers through hosting/reverse proxies. Allow multipart
+uploads and CSV responses through `/api/admin-backend`. Configure request limits
+for the existing 10 MB per-file and up-to-10-files batch contract. Sessions on the
+old frontend host may require login again. No database credentials belong here.
+Public footer links and “Back to website” point to `https://coolerguru.com`.
 
-## Deploy on Vercel
+## Validation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sh
+npm run build
+npm run check
+npm run lint
+node scripts/verify-migration.cjs
+node scripts/http-smoke.cjs
+node scripts/browser-smoke.cjs
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+HTTP/browser scripts need the app running on port 3001. Browser verification
+uses local Chrome and captures desktop/mobile login screenshots. Mock tests
+do not perform live database writes. See [MIGRATION.md](MIGRATION.md) for results
+and remaining verification.

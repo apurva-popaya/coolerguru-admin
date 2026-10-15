@@ -31,7 +31,6 @@ import {
 import {
   deleteCategory,
   getCategories,
-  getCategoryChildren,
   restoreCategory,
 } from "@/lib/api/admin-categories-api";
 
@@ -49,20 +48,8 @@ import type {
 /* Helpers                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function getApiCategories(response: {
-  data?: {
-    categories?: Category[];
-  };
-}): Category[] {
-  return response.data?.categories ?? [];
-}
-
 function categoryStatus(category: Category): "Active" | "Inactive" {
   return category.is_active === false ? "Inactive" : "Active";
-}
-
-function productCount(_category: Category): number {
-  return 0;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -87,95 +74,31 @@ export function AdminCategories() {
     setError("");
 
     try {
-      /*
-       * GET /categories
-       *
-       * Response:
-       * {
-       *   data: {
-       *     categories: [...]
-       *   }
-       * }
-       *
-       * These are the root/main categories.
-       */
-      const rootResponse = await getCategories();
-
-      const roots = getApiCategories(rootResponse);
-
-      const mainCategoryItems = await Promise.all(
-        roots.map(async (root): Promise<MainCategoryItem> => {
-          /*
-           * Get categories under the main category.
-           *
-           * GET /categories/{root.slug}/children
-           */
-          const categoryResponse = await getCategoryChildren(root.slug);
-
-          const children = getApiCategories(categoryResponse);
-
-          const categoryItems = await Promise.all(
-            children.map(async (child): Promise<CategoryItem> => {
-              /*
-               * Get subcategories under this category.
-               *
-               * GET /categories/{child.slug}/children
-               */
-              const subcategoryResponse = await getCategoryChildren(
-                child.slug,
-              );
-
-              const subcategories = getApiCategories(subcategoryResponse);
-
-              return {
-                id: child.slug,
-
-                categoryId: child.category_id,
-
-                name: child.name,
-
-                slug: child.slug,
-
-                status: categoryStatus(child),
-
-                productsCount: productCount(child),
-
-                subcategories: subcategories.map(
-                  (subcategory): SubcategoryItem => ({
-                    id: subcategory.slug,
-
-                    categoryId: subcategory.category_id,
-
-                    name: subcategory.name,
-
-                    slug: subcategory.slug,
-
-                    status: categoryStatus(subcategory),
-
-                    productsCount: productCount(subcategory),
-                  }),
-                ),
-              };
-            }),
-          );
-
-          return {
-            id: root.slug,
-
-            categoryId: root.category_id,
-
-            name: root.name,
-
-            slug: root.slug,
-
-            status: categoryStatus(root),
-
-            productsCount: productCount(root),
-
-            categories: categoryItems,
-          };
-        }),
-      );
+      const response = await getCategories();
+      const mainCategoryItems: MainCategoryItem[] = response.data.categories.map((root) => ({
+        id: root.slug,
+        categoryId: root.category_id,
+        name: root.name,
+        slug: root.slug,
+        status: categoryStatus(root),
+        productsCount: root.product_count,
+        categories: root.children.map((child): CategoryItem => ({
+          id: child.slug,
+          categoryId: child.category_id,
+          name: child.name,
+          slug: child.slug,
+          status: categoryStatus(child),
+          productsCount: child.product_count,
+          subcategories: child.children.map((subcategory): SubcategoryItem => ({
+            id: subcategory.slug,
+            categoryId: subcategory.category_id,
+            name: subcategory.name,
+            slug: subcategory.slug,
+            status: categoryStatus(subcategory),
+            productsCount: subcategory.product_count,
+          })),
+        })),
+      }));
 
       setCategories(mainCategoryItems);
     } catch (error) {
@@ -234,7 +157,7 @@ export function AdminCategories() {
 
       /*
        * Keep the item visible locally as inactive
-       * so the admin can restore it during this session.
+       * so the admin can restore it.
        */
       setCategories((current) =>
         updateCategoryStatusInTree(

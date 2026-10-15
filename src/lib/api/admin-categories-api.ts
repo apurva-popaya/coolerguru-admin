@@ -34,6 +34,30 @@ export interface CategoriesResponse {
   };
 }
 
+export interface AdminCategory extends Category {
+  type: "MAIN_CATEGORY" | "CATEGORY" | "SUBCATEGORY";
+  depth: number;
+  product_count: number;
+  child_count: number;
+  children: AdminCategory[];
+}
+
+export interface AdminCategoriesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    summary: {
+      total: number;
+      main_categories: number;
+      categories: number;
+      subcategories: number;
+      active: number;
+      inactive: number;
+    };
+    categories: AdminCategory[];
+  };
+}
+
 export interface CategoryResponse {
   success: boolean;
   message: string;
@@ -80,11 +104,11 @@ export interface UpdateCategoryRequest {
 
 /* -------------------------------------------------------------------------- */
 /* Get All Categories                                                         */
-/* GET /categories                                                            */
+/* GET /admin/categories?status=ALL                                           */
 /* -------------------------------------------------------------------------- */
 
-export async function getCategories(): Promise<CategoriesResponse> {
-  return apiRequest<CategoriesResponse>("/categories", {
+export async function getCategories(): Promise<AdminCategoriesResponse> {
+  return apiRequest<AdminCategoriesResponse>("/admin/categories?status=ALL", {
     method: "GET",
   });
 }

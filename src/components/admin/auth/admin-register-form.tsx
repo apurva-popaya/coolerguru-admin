@@ -58,7 +58,7 @@ export function AdminRegisterForm() {
           Full Name
         </label>
 
-        <div className="flex h-[48px] items-center rounded-[8px] border border-[#dedfeb] bg-white px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
+        <div className="flex h-[48px] items-center rounded-2xl border border-[#dedfeb] bg-card px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
           <UserRound size={17} className="shrink-0 text-[#7c8098]" />
 
           <input
@@ -67,7 +67,7 @@ export function AdminRegisterForm() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Enter your full name"
-            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-[#11163d] text-admin-14 outline-none placeholder:text-[#a0a3b5]"
+            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-foreground text-admin-14 outline-none placeholder:text-[#a0a3b5]"
           />
         </div>
       </div>
@@ -77,8 +77,8 @@ export function AdminRegisterForm() {
           Mobile Number
         </label>
 
-        <div className="flex h-[48px] overflow-hidden rounded-[8px] border border-[#dedfeb] bg-white transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
-          <div className="flex items-center gap-2 border-[#e6e7ef] border-r bg-[#fafaff] px-3 font-medium text-[#444967] text-admin-14">
+        <div className="flex h-[48px] overflow-hidden rounded-2xl border border-[#dedfeb] bg-card transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
+          <div className="flex items-center gap-2 border-[#e6e7ef] border-r bg-muted/50 px-3 font-medium text-[#444967] text-admin-14">
             <Phone size={16} />
             +91
           </div>
@@ -89,7 +89,7 @@ export function AdminRegisterForm() {
             value={phone}
             onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 10))}
             placeholder="Enter mobile number"
-            className="min-w-0 flex-1 border-0 bg-transparent px-4 text-[#11163d] text-admin-14 outline-none placeholder:text-[#a0a3b5]"
+            className="min-w-0 flex-1 border-0 bg-transparent px-4 text-foreground text-admin-14 outline-none placeholder:text-[#a0a3b5]"
           />
         </div>
       </div>
@@ -99,7 +99,7 @@ export function AdminRegisterForm() {
           Password
         </label>
 
-        <div className="flex h-[48px] items-center rounded-[8px] border border-[#dedfeb] bg-white px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
+        <div className="flex h-[48px] items-center rounded-2xl border border-[#dedfeb] bg-card px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
           <LockKeyhole size={17} className="shrink-0 text-[#7c8098]" />
 
           <input
@@ -108,13 +108,13 @@ export function AdminRegisterForm() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Minimum 8 characters"
-            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-[#11163d] text-admin-14 outline-none placeholder:text-[#a0a3b5]"
+            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-foreground text-admin-14 outline-none placeholder:text-[#a0a3b5]"
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((current) => !current)}
-            className="flex h-8 w-8 items-center justify-center text-[#7c8098] transition hover:text-[#2720a8]"
+            className="flex h-8 w-8 items-center justify-center text-[#7c8098] transition hover:text-primary"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -127,7 +127,7 @@ export function AdminRegisterForm() {
           Confirm Password
         </label>
 
-        <div className="flex h-[48px] items-center rounded-[8px] border border-[#dedfeb] bg-white px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
+        <div className="flex h-[48px] items-center rounded-2xl border border-[#dedfeb] bg-card px-3 transition focus-within:border-[#2720a8] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
           <LockKeyhole size={17} className="shrink-0 text-[#7c8098]" />
 
           <input
@@ -136,13 +136,13 @@ export function AdminRegisterForm() {
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             placeholder="Re-enter your password"
-            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-[#11163d] text-admin-14 outline-none placeholder:text-[#a0a3b5]"
+            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-foreground text-admin-14 outline-none placeholder:text-[#a0a3b5]"
           />
 
           <button
             type="button"
             onClick={() => setShowConfirmPassword((current) => !current)}
-            className="flex h-8 w-8 items-center justify-center text-[#7c8098] transition hover:text-[#2720a8]"
+            className="flex h-8 w-8 items-center justify-center text-[#7c8098] transition hover:text-primary"
             aria-label={showConfirmPassword ? "Hide password" : "Show password"}
           >
             {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -158,7 +158,7 @@ export function AdminRegisterForm() {
 
       <button
         type="submit"
-        className="flex h-[48px] w-full items-center justify-center rounded-[8px] bg-[#2720a8] font-bold text-admin-14 text-white transition hover:bg-[#1d178e]"
+        className="flex h-[48px] w-full items-center justify-center rounded-[8px] bg-primary font-bold text-admin-14 text-primary-foreground transition hover:bg-[#1d178e]"
       >
         Create Admin Account
       </button>
@@ -169,7 +169,7 @@ export function AdminRegisterForm() {
 
       <div className="text-center text-[#72768d] text-admin-14">
         Already have an admin account?{" "}
-        <Link href="/login" className="font-bold text-[#2720a8] hover:underline">
+        <Link href="/login" className="font-bold text-primary hover:underline">
           Login
         </Link>
       </div>

@@ -11,28 +11,6 @@ import type { DataTableFeatures } from "@/lib/data-table-features";
 
 import type { InquiryRow } from "./inquiries-data";
 
-function statusVariant(status: InquiryRow["status"]): StatusVariant {
-  switch (status) {
-    case "New":
-      return "info";
-
-    case "Replied":
-      return "success";
-
-    case "In Discussion":
-      return "warning";
-
-    case "Closed":
-      return "neutral";
-
-    case "Closed":
-      return "neutral";
-
-    default:
-      return "neutral";
-  }
-}
-
 function inquiryTypeVariant(
   type: InquiryRow["inquiryType"],
 ): StatusVariant {
@@ -64,7 +42,7 @@ export const inquiriesColumns: ColumnDef<DataTableFeatures, InquiryRow>[] = [
 
     header: "Inquiry ID",
 
-    cell: ({ row }) => <span className="font-semibold text-[#2720a8]">{row.original.id}</span>,
+    cell: ({ row }) => <span className="block truncate font-semibold text-primary" title={row.original.id}>{row.original.id}</span>,
   },
 
   {
@@ -75,8 +53,8 @@ export const inquiriesColumns: ColumnDef<DataTableFeatures, InquiryRow>[] = [
     filterFn: "equalsString",
 
     cell: ({ row }) => (
-      <div className="min-w-[160px]">
-        <p className="font-semibold text-[#15136f]">{row.original.buyerName}</p>
+      <div className="min-w-0">
+        <p className="font-semibold text-foreground">{row.original.buyerName}</p>
 
         <p className="mt-1 text-admin-14 text-muted-foreground">{row.original.buyerLocation}</p>
       </div>
@@ -91,8 +69,8 @@ export const inquiriesColumns: ColumnDef<DataTableFeatures, InquiryRow>[] = [
     filterFn: "equalsString",
 
     cell: ({ row }) => (
-      <div className="min-w-[180px]">
-        <p className="font-semibold text-[#15136f]">{row.original.companyName}</p>
+      <div className="min-w-0">
+        <p className="font-semibold text-foreground">{row.original.companyName}</p>
 
         <p className="mt-1 text-admin-14 text-muted-foreground">{row.original.companyLocation}</p>
       </div>
@@ -119,19 +97,7 @@ export const inquiriesColumns: ColumnDef<DataTableFeatures, InquiryRow>[] = [
     ),
   },
 
-  {
-    accessorKey: "quantity",
 
-    header: "Quantity",
-  },
-
-  {
-    accessorKey: "createdDate",
-
-    header: "Created Date",
-
-    cell: ({ row }) => <span className="whitespace-nowrap text-[#5d6280]">{row.original.createdDate}</span>,
-  },
 
   // {
   //   accessorKey: "status",
@@ -153,12 +119,12 @@ export const inquiriesColumns: ColumnDef<DataTableFeatures, InquiryRow>[] = [
         <Button
           asChild
           variant="outline"
-          size="sm"
-          className="h-8 gap-2 border-[#cfcdf5] px-3 text-[#2720a8] hover:bg-[#f3f2ff]"
+          size="icon"
+          aria-label={`View inquiry ${row.original.id}`}
+          title="View inquiry"
         >
           <Link href={`/inquiries/${row.original.id}`}>
-            <Eye className="size-4" />
-            View
+            <Eye />
           </Link>
         </Button>
       </div>

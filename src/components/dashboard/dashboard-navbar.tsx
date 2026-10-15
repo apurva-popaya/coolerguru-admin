@@ -214,13 +214,13 @@ export function DashboardNavbar({
   }
 
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-[#e7e8f3] bg-white">
-      <div className="flex min-h-16 flex-wrap items-center py-2 lg:py-0">
+    <header className="sticky top-0 z-30 w-full border-b border-border bg-card">
+      <div className="flex min-h-20 flex-wrap items-center py-3 lg:py-0">
         {/* -------------------------------------------------
             LOGO
         ------------------------------------------------- */}
         <div
-          className={`hidden h-16 shrink-0 items-center lg:flex border-r border-[#e7e8f3] transition-[width] duration-200 lg:flex ${
+          className={`hidden h-16 shrink-0 items-center lg:flex border-r border-border transition-[width] duration-200 lg:flex ${
             expanded
               ? "w-[250px] 2xl:w-[280px] px-4"
               : "w-[62px] px-2"
@@ -240,7 +240,7 @@ export function DashboardNavbar({
                 className="h-[50px] w-[145px] object-contain"
               />
             ) : (
-              <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#f0efff] font-bold text-admin-14 text-[#2720a8]">
+              <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-accent font-bold text-admin-14 text-primary">
                 CG
               </div>
             )}
@@ -280,12 +280,12 @@ export function DashboardNavbar({
             {showSearch && (
               <div
                 ref={searchRef}
-                className="relative order-last w-full min-w-0 lg:order-none lg:flex-1 lg:max-w-[700px]"
+                className="relative order-last w-full min-w-0 lg:order-none lg:flex-1 lg:max-w-3xl"
               >
                 {/* -------------------------------------------------
                     SEARCH BAR
                 ------------------------------------------------- */}
-                <div className="flex h-11 w-full items-center rounded-[8px] border border-[#d9daf0] bg-white shadow-[0_1px_3px_rgba(39,32,168,0.05)] transition-all focus-within:border-[#9d99df] focus-within:ring-2 focus-within:ring-[#2720a8]/10">
+                <div className="flex h-12 w-full items-center overflow-hidden rounded-full border border-input bg-card shadow-sm transition-all focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20">
                   {/* Search Type Button */}
                   <button
                     type="button"
@@ -295,22 +295,22 @@ export function DashboardNavbar({
                           !previous,
                       )
                     }
-                    className={`flex h-full w-[125px] sm:w-[150px] shrink-0 items-center justify-between gap-2 border-r border-[#e6e6f1] bg-[#fafaff] px-1 m-2 text-left transition-colors ${
+                    className={`flex h-full w-[125px] sm:w-[150px] shrink-0 items-center justify-between gap-2 border-r border-border bg-muted/50 px-3 sm:px-4 text-left transition-colors ${
                       dropdownOpen
-                        ? "bg-[#f3f2ff]"
-                        : "hover:bg-[#f7f7ff]"
+                        ? "bg-accent"
+                        : "hover:bg-accent"
                     }`}
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <SelectedIcon className="size-[15px] shrink-0 text-[#2720a8]" />
+                      <SelectedIcon className="size-[15px] shrink-0 text-primary" />
 
-                      <span className="truncate text-admin-14 font-semibold text-[#2720a8]">
+                      <span className="truncate text-admin-14 font-semibold text-primary">
                         {selectedOption.label}
                       </span>
                     </span>
 
                     <ChevronDown
-                      className={`size-[14px] shrink-0 text-[#777b9b] transition-transform duration-200 ${
+                      className={`size-[14px] shrink-0 text-muted-foreground transition-transform duration-200 ${
                         dropdownOpen
                           ? "rotate-180"
                           : ""
@@ -319,8 +319,8 @@ export function DashboardNavbar({
                   </button>
 
                   {/* Search Input */}
-                  <div className="relative flex min-w-0 flex-1 items-center">
-                    <Search className="pointer-events-none absolute left-3 size-[15px] text-[#9296b0]" />
+                  <div className="relative flex h-full min-w-0 flex-1 items-center">
+                    <Search className="pointer-events-none absolute left-3 size-[15px] text-muted-foreground" />
 
                     <Input
                       type="search"
@@ -334,11 +334,11 @@ export function DashboardNavbar({
                         handleInputKeyDown
                       }
                       aria-label="Search admin records"
-                    placeholder={
+                      placeholder={
                         searchPlaceholder ??
                         selectedOption.placeholder
                       }
-                      className="h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-3 pl-9 text-admin-14 text-[#15136f] shadow-none outline-none placeholder:text-[#9b9eb7] focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-3 pl-9 shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                     />
                   </div>
 
@@ -350,7 +350,7 @@ export function DashboardNavbar({
                     disabled={
                       !searchValue.trim()
                     }
-                    className="mr-1 h-9 min-w-0 sm:min-w-20.5 shrink-0 rounded-[6px] bg-[#2720a8] px-3 font-semibold text-admin-14 text-white shadow-none hover:bg-[#15136f] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="mr-1 h-10 min-w-0 shrink-0 rounded-full px-3 shadow-none sm:min-w-20.5 sm:px-4"
                   >
                     <Search data-icon="inline-start" />
 
@@ -364,7 +364,7 @@ export function DashboardNavbar({
                     CUSTOM SEARCH TYPE DROPDOWN
                 ------------------------------------------------- */}
                 {dropdownOpen && (
-                  <div className="absolute left-0 top-[calc(100%+6px)] z-[9999] w-[190px] overflow-hidden rounded-[9px] border border-[#dedff0] bg-white p-1.5 shadow-[0_10px_30px_rgba(30,32,80,0.14)]">
+                  <div className="absolute left-0 top-[calc(100%+6px)] z-[9999] w-[190px] overflow-hidden rounded-[9px] border border-[#dedff0] bg-card p-1.5 shadow-[0_10px_30px_rgba(30,32,80,0.14)]">
                     <div className="px-2.5 pb-1.5 pt-1 text-admin-14 font-semibold uppercase tracking-[0.08em] text-[#9699b2]">
                       Search in
                     </div>
@@ -391,7 +391,7 @@ export function DashboardNavbar({
                             }
                             className={`flex w-full items-center justify-between rounded-[7px] px-2.5 py-2.5 text-left transition-colors ${
                               isSelected
-                                ? "bg-[#f1f0ff] text-[#2720a8]"
+                                ? "bg-[#f1f0ff] text-primary"
                                 : "text-[#35385b] hover:bg-[#f7f7fb]"
                             }`}
                           >
@@ -399,7 +399,7 @@ export function DashboardNavbar({
                               <span
                                 className={`flex h-[28px] w-[28px] items-center justify-center rounded-[6px] ${
                                   isSelected
-                                    ? "bg-white"
+                                    ? "bg-card"
                                     : "bg-[#f5f5fa]"
                                 }`}
                               >
@@ -414,7 +414,7 @@ export function DashboardNavbar({
                             </span>
 
                             {isSelected && (
-                              <Check className="size-[14px] text-[#2720a8]" />
+                              <Check className="size-[14px] text-primary" />
                             )}
                           </button>
                         );

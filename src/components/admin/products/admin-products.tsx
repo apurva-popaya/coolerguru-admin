@@ -20,7 +20,7 @@ import { dataTableFeatures } from "@/lib/data-table-features";
 
 import { createProductsColumns } from "./products-columns";
 import { mapAdminProductToRow, type ProductRow } from "./products-data";
-import { type ProductFilterOption, ProductsFilters, type ProductsFilterValues } from "./products-filters";
+import { ProductsFilters, type ProductsFilterValues } from "./products-filters";
 import { ProductsStats } from "./products-stats";
 
 const initialFilters: ProductsFilterValues = {
@@ -74,10 +74,6 @@ export function AdminProducts() {
   });
 
   const [rowSelection, setRowSelection] = React.useState({});
-
-  const [companyOptions, setCompanyOptions] = React.useState<ProductFilterOption[]>([]);
-
-  const [categoryOptions, setCategoryOptions] = React.useState<ProductFilterOption[]>([]);
 
   const [exporting, setExporting] = React.useState(false);
 
@@ -165,23 +161,6 @@ export function AdminProducts() {
 
         setTotalPages(Math.max(Math.ceil(matchingProducts.length / pagination.pageSize), 1));
 
-        const companies = allProducts
-          .filter((product) => product.company !== null)
-          .map((product) => ({
-            value: String(product.company!.company_id),
-
-            label: product.company!.name,
-          }));
-
-        setCompanyOptions(Array.from(new Map(companies.map((company) => [company.value, company])).values()).sort((a, b) => a.label.localeCompare(b.label)));
-
-        const categories = allProducts.map((product) => ({
-          value: String(product.category.category_id),
-
-          label: product.category.name,
-        }));
-
-        setCategoryOptions(Array.from(new Map(categories.map((category) => [category.value, category])).values()).sort((a, b) => a.label.localeCompare(b.label)));
       } catch (error) {
         if (!active) {
           return;
@@ -268,15 +247,6 @@ export function AdminProducts() {
     }));
   }
 
-  function handleSearch() {
-    setAppliedSearch(filters.search.trim());
-
-    setPagination((previous) => ({
-      ...previous,
-      pageIndex: 0,
-    }));
-  }
-
   function handleReset() {
   setFilters(initialFilters);
   setRowSelection({});
@@ -340,7 +310,7 @@ export function AdminProducts() {
             onClick={handleExport}
             disabled={exporting || loading}
             aria-busy={exporting}
-            className="h-10 gap-2 border-[#cfcdf5] text-[#2720a8] disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-10 gap-2 border-[#cfcdf5] text-primary disabled:cursor-not-allowed disabled:opacity-60"
           >
             {exporting ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
             {exporting ? "Exporting..." : "Export Products"}
@@ -351,7 +321,7 @@ export function AdminProducts() {
       {exportError ? (
         <div
           role="alert"
-          className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-[12px] font-medium text-red-600"
+          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[12px] font-medium text-red-600"
         >
           {exportError}
         </div>
@@ -359,32 +329,27 @@ export function AdminProducts() {
 
       <ProductsStats
         total={summary.total}
-        active={summary.active}
-        inactive={summary.inactive}
         approved={summary.approved}
         pending={summary.pending_approval}
-        outOfStock={summary.out_of_stock}
       />
 
       <ProductsFilters
         values={filters}
-        companies={companyOptions}
-        categories={categoryOptions}
         onChange={handleFiltersChange}
-        onSearch={handleSearch}
         onReset={handleReset}
       />
 
       {error ? (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
           {error}
         </div>
       ) : null}
 
       <div>
-        <h2 className="mb-3 text-admin-17 font-bold text-[#15136f]">Products ({totalItems})</h2>
+        <h2 className="mb-3 text-admin-17 font-bold text-foreground">Products ({totalItems})</h2>
 
         <DataTable
+          className="products-table"
           table={table}
           emptyState={{
             title: loading ? "Loading products..." : "No products found",

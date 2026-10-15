@@ -121,7 +121,7 @@ function getDropClassName(
     company.isFeatured &&
     company.companyId === dropTargetCompanyId
   ) {
-    return "rounded-md bg-[#f3f2ff] ring-2 ring-inset ring-[#6c63ff]";
+    return "rounded-md bg-accent ring-2 ring-inset ring-[#6c63ff]";
   }
 
   return "rounded-md";
@@ -231,7 +231,7 @@ export function createFeaturedCompaniesColumns({
               <div className="size-7 shrink-0" />
             )}
 
-            <div className="flex h-10 min-w-[56px] items-center justify-center font-bold text-[#15136f] text-admin-15">
+            <div className="flex h-10 min-w-[56px] items-center justify-center font-bold text-foreground text-admin-15">
               {company.logoUrl ? (
                 <img
                   src={company.logoUrl}
@@ -244,7 +244,7 @@ export function createFeaturedCompaniesColumns({
               )}
             </div>
 
-            <span className="font-semibold text-[#15136f]">
+            <span className="font-semibold text-foreground">
               {company.name}
             </span>
           </div>
@@ -272,7 +272,7 @@ export function createFeaturedCompaniesColumns({
               dropTargetCompanyId,
             )}`}
           >
-            <span className="text-[#5d6280]">
+            <span className="text-muted-foreground">
               {company.location}
             </span>
           </div>
@@ -339,7 +339,7 @@ export function createFeaturedCompaniesColumns({
               dropTargetCompanyId,
             )}`}
           >
-            <span className="text-[#5d6280]">
+            <span className="text-muted-foreground">
               {formatDate(company.featuredSince)}
             </span>
           </div>
@@ -368,11 +368,11 @@ export function createFeaturedCompaniesColumns({
             )}`}
           >
             {company.priority !== null ? (
-              <div className="flex size-10 items-center justify-center rounded-[7px] border border-border bg-white font-medium text-[#15136f] text-admin-14">
+              <div className="flex size-10 items-center justify-center rounded-[7px] border border-border bg-card font-medium text-foreground text-admin-14">
                 {company.priority}
               </div>
             ) : (
-              <div className="flex size-10 items-center justify-center rounded-[7px] border border-border bg-white text-admin-14 text-muted-foreground">
+              <div className="flex size-10 items-center justify-center rounded-[7px] border border-border bg-card text-admin-14 text-muted-foreground">
                 -
               </div>
             )}
@@ -430,7 +430,7 @@ export function createFeaturedCompaniesColumns({
                     company.priority,
                   )
                 }
-                className="h-9 min-w-[180px] gap-2 border-[#8ea0ff] text-[#2720a8] hover:bg-[#f3f2ff]"
+                className="h-9 min-w-[180px] gap-2 border-[#8ea0ff] text-primary hover:bg-accent"
               >
                 <Plus className="size-4" />
                 Add to Featured

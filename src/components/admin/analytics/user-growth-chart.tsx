@@ -12,7 +12,9 @@ import {
   YAxis,
 } from "recharts";
 
-import type { UserGrowthPoint } from "../../../lib/api/admin-analytics-api";
+import type { UserGrowthPoint } from "@/lib/api/admin-analytics-api";
+
+import { formatChartDate } from "./format-chart-date";
 
 interface UserGrowthChartProps {
   data: UserGrowthPoint[];
@@ -46,16 +48,16 @@ export function UserGrowthChart({
 
   return (
     <div
-      className="min-h-[300px] min-w-0 rounded-[10px] border border-border bg-white p-4"
+      className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5"
       onClick={handleChartClick}
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-bold text-[#15136f] text-admin-15">
+        <h2 className="font-bold text-foreground text-admin-15">
           User Growth
         </h2>
 
         <div
-          className="flex items-center gap-4 text-[#5d6280] text-admin-14"
+          className="flex items-center gap-4 text-muted-foreground text-admin-14"
           onClick={(event) => {
             event.stopPropagation();
           }}
@@ -73,7 +75,7 @@ export function UserGrowthChart({
             }`}
             aria-pressed={activeSeries === "buyers"}
           >
-            <span className="size-2 rounded-full bg-[#2720a8]" />
+            <span className="size-2 rounded-full bg-primary" />
             Buyers
           </button>
 
@@ -90,13 +92,13 @@ export function UserGrowthChart({
             }`}
             aria-pressed={activeSeries === "suppliers"}
           >
-            <span className="size-2 rounded-full bg-[#928df3]" />
+            <span className="size-2 rounded-full bg-chart-3" />
             Suppliers
           </button>
         </div>
       </div>
 
-      <div className="h-[220px] min-w-0 sm:h-[260px]">
+      <div className="h-64 min-w-0 sm:h-72">
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -118,6 +120,7 @@ export function UserGrowthChart({
 
             <XAxis
               dataKey="label"
+              tickFormatter={formatChartDate}
               interval="preserveStartEnd"
               minTickGap={24}
               tickMargin={10}
@@ -140,19 +143,16 @@ export function UserGrowthChart({
               tickLine={false}
             />
 
-            <Tooltip />
+            <Tooltip labelFormatter={(value) => formatChartDate(String(value))} contentStyle={{ borderRadius: "12px", borderColor: "var(--border)", background: "var(--popover)", color: "var(--popover-foreground)" }} />
 
             {/* BUYERS LINE */}
             {activeSeries !== "suppliers" && (
               <Line
                 type="monotone"
                 dataKey="buyers"
-                stroke="#2720a8"
+                stroke="var(--primary)"
                 strokeWidth={2}
-                dot={{
-                  r: 3,
-                  fill: "#2720a8",
-                }}
+                dot={false} activeDot={{ r: 4 }}
               />
             )}
 
@@ -161,12 +161,9 @@ export function UserGrowthChart({
               <Line
                 type="monotone"
                 dataKey="suppliers"
-                stroke="#928df3"
+                stroke="var(--chart-3)"
                 strokeWidth={2}
-                dot={{
-                  r: 3,
-                  fill: "#928df3",
-                }}
+                dot={false} activeDot={{ r: 4 }}
               />
             )}
           </LineChart>

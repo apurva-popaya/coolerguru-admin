@@ -1,10 +1,14 @@
 "use client";
 
 import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { DateRangePicker } from "@/components/common/date-range-picker";
+import { PageHeader } from "@/components/common/page-header";
 
 import {
   Building2,
   CalendarDays,
+  ChevronDown,
   MessageSquare,
   Package,
   Store,
@@ -15,6 +19,7 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -24,7 +29,7 @@ import {
   getAdminAnalytics,
   type AdminAnalyticsData,
   type AnalyticsGranularity,
-} from "../../../lib/api/admin-analytics-api";
+} from "@/lib/api/admin-analytics-api";
 
 import type { RankingItem } from "./analytics-data";
 
@@ -51,27 +56,10 @@ const monthlyStatIcons = [
 
 function getDefaultDateRange() {
   const today = new Date();
-
-  const year = today.getFullYear();
-
-  const dateFrom = `${year}-01-01`;
-
-  const dateTo = [
-    year,
-    String(today.getMonth() + 1).padStart(
-      2,
-      "0",
-    ),
-    String(today.getDate()).padStart(
-      2,
-      "0",
-    ),
-  ].join("-");
-
-  return {
-    dateFrom,
-    dateTo,
-  };
+  const lastDay = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  const from = new Date(today.getFullYear(), today.getMonth() - 1, Math.min(today.getDate(), lastDay));
+  const format = (date: Date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
+  return { dateFrom: format(from), dateTo: format(today) };
 }
 
 function formatDateRange(
@@ -173,7 +161,7 @@ export function AdminAnalytics() {
   const [period, setPeriod] =
     React.useState<
       "daily" | "weekly" | "monthly"
-    >("monthly");
+    >("daily");
 
   const [
     analytics,
@@ -302,7 +290,7 @@ export function AdminAnalytics() {
 
   if (loading && !analytics) {
     return (
-      <div className="space-y-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <AnalyticsHeader
           dateFrom={dateFrom}
           dateTo={dateTo}
@@ -314,8 +302,8 @@ export function AdminAnalytics() {
           }
         />
 
-        <div className="flex h-[400px] items-center justify-center rounded-[10px] border border-border bg-white">
-          <div className="text-[#5d6280] text-admin-15">
+        <div className="flex h-[400px] items-center justify-center rounded-2xl border border-border bg-card">
+          <div className="text-muted-foreground text-admin-15">
             Loading analytics...
           </div>
         </div>
@@ -325,7 +313,7 @@ export function AdminAnalytics() {
 
   if (error && !analytics) {
     return (
-      <div className="space-y-4">
+      <div className="flex min-w-0 flex-col gap-4">
         <AnalyticsHeader
           dateFrom={dateFrom}
           dateTo={dateTo}
@@ -337,8 +325,8 @@ export function AdminAnalytics() {
           }
         />
 
-        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[10px] border border-red-200 bg-white p-6 text-center">
-          <p className="font-semibold text-[#15136f] text-admin-15">
+        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-red-200 bg-card p-6 text-center">
+          <p className="font-semibold text-foreground text-admin-15">
             Unable to load analytics
           </p>
 
@@ -351,7 +339,7 @@ export function AdminAnalytics() {
             onClick={() =>
               void fetchAnalytics()
             }
-            className="mt-4 rounded-[7px] bg-[#2720a8] px-4 py-2 font-medium text-white text-admin-14 hover:bg-[#15136f]"
+            className="mt-4 rounded-[7px] bg-primary px-4 py-2 font-medium text-primary-foreground text-admin-14 hover:bg-primary/90"
           >
             Try Again
           </button>
@@ -365,7 +353,7 @@ export function AdminAnalytics() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <AnalyticsHeader
         dateFrom={dateFrom}
         dateTo={dateTo}
@@ -378,14 +366,14 @@ export function AdminAnalytics() {
       />
 
       {error && (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-red-600 text-admin-14">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-600 text-admin-14">
           {error}
         </div>
       )}
 
       {/* PRIMARY STATS */}
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <AnalyticsStatCard
           title="Total Users"
           value={formatNumber(
@@ -445,11 +433,7 @@ export function AdminAnalytics() {
             comparisonLabel
           }
         />
-      </div>
 
-      {/* PRODUCTS + INQUIRIES */}
-
-      <div className="grid gap-3 md:grid-cols-2 ">
         <AnalyticsStatCard
           title="Products"
           value={formatNumber(
@@ -483,7 +467,7 @@ export function AdminAnalytics() {
 
       {/* NEW DATA */}
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
         <AnalyticsStatCard
           title="New Users"
           value={formatNumber(
@@ -532,7 +516,7 @@ export function AdminAnalytics() {
 
       {/* CHARTS */}
 
-      <div className="grid gap-3 xl:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-2">
         <InquiryVolumeChart
           data={
             analytics.inquiry_volume
@@ -548,16 +532,17 @@ export function AdminAnalytics() {
           }
         />
 
+
+      </div>
+
+      {/* RANKINGS */}
+
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-3">
         <TopCategories
           data={
             analytics.top_categories
           }
         />
-      </div>
-
-      {/* RANKINGS */}
-
-      <div className="grid gap-3 md:grid-cols-2">
         <AnalyticsRankingCard
           title="Most Saved Products"
           items={mostSavedProducts}
@@ -572,7 +557,7 @@ export function AdminAnalytics() {
       </div>
 
       {loading && (
-        <div className="text-center text-[#5d6280] text-admin-14">
+        <div className="text-center text-muted-foreground text-admin-14">
           Updating analytics...
         </div>
       )}
@@ -611,79 +596,47 @@ function AnalyticsHeader({
   onDateToChange,
   onPeriodChange,
 }: AnalyticsHeaderProps) {
+  const [open, setOpen] = React.useState(false);
+  const [draftFrom, setDraftFrom] = React.useState(dateFrom);
+  const [draftTo, setDraftTo] = React.useState(dateTo);
+  const container = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const onOutside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !container.current?.contains(event.target)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onOutside, true);
+    return () => document.removeEventListener("pointerdown", onOutside, true);
+  }, [open]);
+
   return (
-    <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-      <div>
-        <h1 className="font-bold text-[#15136f] text-admin-27 leading-none">
-          Analytics
-        </h1>
-
-        <p className="mt-2 text-[#5d6280] text-admin-14">
-          Track overall platform performance and
-          aggregated insights across buyers,
-          suppliers, companies, products, and
-          inquiries.
-        </p>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex h-10 items-center gap-2 rounded-[7px] border border-border bg-white px-3">
-          <CalendarDays className="size-4 text-[#2720a8]" />
-
-          <input
-            type="date"
-            value={dateFrom}
-            max={dateTo}
-            onChange={(event) =>
-              onDateFromChange(
-                event.target.value,
-              )
-            }
-            className="h-8 border-0 bg-transparent font-medium text-[#15136f] text-admin-14 outline-none"
-          />
-
-          <span className="text-[#5d6280] text-admin-14">
-            –
-          </span>
-
-          <input
-            type="date"
-            value={dateTo}
-            min={dateFrom}
-            onChange={(event) =>
-              onDateToChange(
-                event.target.value,
-              )
-            }
-            className="h-8 border-0 bg-transparent font-medium text-[#15136f] text-admin-14 outline-none"
-          />
+    <PageHeader title="Analytics" description="Track platform performance, growth and engagement."
+      action={
+        <div className="flex flex-wrap items-center gap-3">
+          <div ref={container} data-admin-date-picker className="relative">
+            <Button type="button" variant="outline" aria-expanded={open} aria-haspopup="dialog"
+              className="h-[42px] rounded-xl px-4" onClick={() => {
+                setDraftFrom(dateFrom); setDraftTo(dateTo); setOpen((previous) => !previous);
+              }}>
+              <CalendarDays data-icon="inline-start" />{formatDateRange(dateFrom, dateTo)}
+              <ChevronDown data-icon="inline-end" />
+            </Button>
+            {open && <DateRangePicker draftDateFrom={draftFrom} draftDateTo={draftTo}
+              setDraftDateFrom={setDraftFrom} setDraftDateTo={setDraftTo}
+              onCancel={() => setOpen(false)} onApply={() => {
+                if (!draftFrom || !draftTo || draftFrom > draftTo) return;
+                onDateFromChange(draftFrom); onDateToChange(draftTo); setOpen(false);
+              }} />}
+          </div>
+          <Select value={period} onValueChange={onPeriodChange}>
+            <SelectTrigger aria-label="Chart interval" className="w-32 rounded-xl data-[size=default]:h-[42px]"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectGroup>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+            </SelectGroup></SelectContent>
+          </Select>
         </div>
-
-        <Select
-          value={period}
-          onValueChange={
-            onPeriodChange
-          }
-        >
-          <SelectTrigger className="h-10 w-[125px]">
-            <SelectValue />
-          </SelectTrigger>
-
-          <SelectContent className="text-admin-15 [&_[data-slot=select-item]]:text-admin-15">
-            <SelectItem value="daily">
-              Daily
-            </SelectItem>
-
-            <SelectItem value="weekly">
-              Weekly
-            </SelectItem>
-
-            <SelectItem value="monthly">
-              Monthly
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
+      } />
   );
 }

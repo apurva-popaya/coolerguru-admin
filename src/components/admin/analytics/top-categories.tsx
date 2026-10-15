@@ -1,4 +1,5 @@
-import type { TopCategory } from "../../../lib/api/admin-analytics-api";
+import Link from "next/link";
+import type { TopCategory } from "@/lib/api/admin-analytics-api";
 
 interface TopCategoriesProps {
   data: TopCategory[];
@@ -17,21 +18,21 @@ export function TopCategories({
       : 0;
 
   return (
-    <div className="min-h-[300px] rounded-[10px] border border-border bg-white p-4">
+    <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-bold text-[#15136f] text-admin-15">
+        <h2 className="font-bold text-foreground text-admin-15">
           Top Categories
         </h2>
 
-        <button
-          type="button"
-          className="font-semibold text-[#2720a8] text-admin-14"
+        <Link
+          href="/categories"
+          className="font-semibold text-primary text-admin-14"
         >
           View All
-        </button>
+        </Link>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-4">
         {data.map((category) => {
           const percentage =
             maximum > 0
@@ -45,20 +46,20 @@ export function TopCategories({
               key={category.category_id}
               className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_45px] items-center gap-3"
             >
-              <span className="truncate text-[#5d6280] text-admin-14">
+              <span className="truncate text-muted-foreground text-admin-14" title={category.name}>
                 {category.name}
               </span>
 
-              <div className="h-[12px] overflow-hidden rounded-[3px] bg-[#edeef7]">
+              <div className="h-[12px] overflow-hidden rounded-[3px] bg-muted">
                 <div
-                  className="h-full rounded-[3px] bg-[#8b85f5]"
+                  className="h-full rounded-[3px] bg-primary/70"
                   style={{
                     width: `${percentage}%`,
                   }}
                 />
               </div>
 
-              <span className="text-right text-[#5d6280] text-admin-14">
+              <span className="text-right text-muted-foreground text-admin-14">
                 {category.product_count.toLocaleString(
                   "en-IN",
                 )}
@@ -68,7 +69,7 @@ export function TopCategories({
         })}
 
         {data.length === 0 && (
-          <div className="flex h-[130px] items-center justify-center text-[#5d6280] text-admin-14">
+          <div className="flex h-[130px] items-center justify-center text-muted-foreground text-admin-14">
             No category data available
           </div>
         )}

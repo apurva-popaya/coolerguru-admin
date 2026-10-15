@@ -19,6 +19,8 @@ import {
   Users,
 } from "lucide-react";
 
+import { cn } from "cn";
+
 import { useSidebar } from "@/components/ui/sidebar";
 import type { DashboardIconName, DashboardNavGroup } from "@/navigation/dashboard/types";
 
@@ -93,14 +95,14 @@ export function DashboardNav({ groups, forceExpanded = false, onNavigate }: Dash
   };
 
   return (
-    <div className="py-5">
+    <div className="flex flex-col gap-7 py-6">
       {groups.map((group) => (
         <div key={group.id} className={expanded ? "px-3" : "px-2"}>
           {group.label && expanded ? (
-            <p className="mb-3 px-2 font-bold text-[#15136f] text-admin-14 uppercase tracking-[0.03em]">{group.label}</p>
+            <p className="mb-3 px-2 font-semibold text-muted-foreground text-xs uppercase tracking-widest">{group.label}</p>
           ) : null}
 
-          <nav className="flex flex-col gap-[2px]">
+          <nav className="flex flex-col gap-1.5">
             {group.items.map((item) => {
               const Icon = getIcon(item.icon);
 
@@ -115,9 +117,13 @@ export function DashboardNav({ groups, forceExpanded = false, onNavigate }: Dash
                   aria-current={active ? "page" : undefined}
                   aria-label={item.title}
                   title={!expanded ? item.title : undefined}
-                  className={`flex min-h-11 py-2 items-center rounded-[6px] font-semibold text-admin-14 transition ${expanded ? "gap-3 px-3" : "justify-center px-0"} ${active ? "!text-[#2720a8] bg-[#f0efff]" : "!text-[#292e55] hover:!text-[#2720a8] hover:bg-[#f7f6ff]"}`}
+                  className={cn(
+                    "flex min-h-12 items-center rounded-xl py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    expanded ? "gap-3 px-3" : "justify-center px-0",
+                    active ? "bg-accent text-primary font-semibold" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
                 >
-                  <Icon size={16} className="shrink-0" />
+                  <Icon size={19} className="shrink-0" />
 
                   {expanded ? <span className="break-words">{item.title}</span> : null}
                 </Link>

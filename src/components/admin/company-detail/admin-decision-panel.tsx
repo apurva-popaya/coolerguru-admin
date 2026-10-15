@@ -144,15 +144,15 @@ export function AdminDecisionPanel({
       <div className="rounded-[9px] border border-[#ddd9ff] bg-[#faf9ff] p-4">
         <div className="mb-4 flex items-start gap-3">
           <div className="flex size-9 items-center justify-center rounded-full bg-[#f0edff]">
-            <ClipboardCheck className="size-4 text-[#2720a8]" />
+            <ClipboardCheck className="size-4 text-primary" />
           </div>
 
           <div>
-            <h2 className="font-bold text-[#15136f] text-admin-15">
+            <h2 className="font-bold text-foreground text-admin-15">
               Admin Decision
             </h2>
 
-            <p className="mt-1 text-[#5d6280] text-admin-14">
+            <p className="mt-1 text-muted-foreground text-admin-14">
               Review the company information and verification documents before taking an action.
             </p>
           </div>
@@ -174,7 +174,7 @@ export function AdminDecisionPanel({
             onClick={() =>
               void handleApprove()
             }
-            className="h-10 w-full gap-2 bg-[#2720a8] text-white hover:bg-[#15136f]"
+            className="h-10 w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Check className="size-4" />
 

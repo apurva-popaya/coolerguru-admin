@@ -65,22 +65,22 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger aria-label={`Account menu for ${user.name}`} className="flex min-w-0 lg:min-w-[180px] xl:min-w-[230px] items-center gap-3 rounded-[7px] border border-[#dcddef] bg-white px-2 py-1 sm:px-3 text-left outline-none transition-colors hover:bg-[#fafaff]">
+      <DropdownMenuTrigger aria-label={`Account menu for ${user.name}`} className="flex min-w-0 lg:min-w-[180px] xl:min-w-[230px] items-center gap-3 rounded-xl bg-card px-2 py-1 sm:px-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors hover:bg-muted/50">
         <Avatar className="size-[38px]">
           {user.avatar && <AvatarImage src={user.avatar} alt={user.name} />}
 
-          <AvatarFallback className="bg-[#dbe3ff] font-semibold text-[#2720a8]">
+          <AvatarFallback className="bg-accent font-semibold text-primary">
             {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>
 
         <div className="hidden min-w-0 max-w-40 flex-1 xl:block">
-          <div className="truncate font-semibold text-[#11163d] text-admin-14 leading-snug">{user.name}</div>
+          <div className="truncate font-semibold text-foreground text-admin-14 leading-snug">{user.name}</div>
 
-          {user.subtitle && <div className="truncate text-[#5d6280] text-admin-14 leading-snug">{user.subtitle}</div>}
+          {user.subtitle && <div className="truncate text-muted-foreground text-admin-14 leading-snug">{user.subtitle}</div>}
         </div>
 
-        <ChevronDown className="hidden size-4 shrink-0 text-[#2720a8] sm:block" />
+        <ChevronDown className="hidden size-4 shrink-0 text-primary sm:block" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-[230px]">

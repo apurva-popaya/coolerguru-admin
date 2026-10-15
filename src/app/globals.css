@@ -195,6 +195,44 @@ select {
   font-family: inherit;
 }
 
+/* Shared interaction cues, including controls rendered in portals. */
+:where(
+  button,
+  a[href],
+  select,
+  summary,
+  label[for],
+  input:is([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"], [type="file"], [type="date"]),
+  [role="button"],
+  [role="link"],
+  [role="tab"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="switch"],
+  [role="combobox"],
+  [role="option"],
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"]
+):not(:where(
+  :disabled,
+  [aria-disabled="true"],
+  [data-disabled],
+  [inert],
+  [inert] *,
+  [aria-disabled="true"] *,
+  [data-disabled] *,
+  [draggable="true"],
+  .cursor-grab,
+  .cursor-grabbing
+)) {
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
 /* =========================================================
    LINKS
    ========================================================= */
@@ -387,12 +425,12 @@ img {
 
 /* Shared dashboard widgets opt into admin sizing without affecting buyer/supplier pages. */
 .admin-ui {
-  font-size: var(--text-admin-16);
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .admin-ui .admin-page-header h1 {
-  font-size: var(--text-admin-28);
+  font-size: clamp(1.75rem, 2vw, 2.25rem);
   line-height: 1.25;
 }
 
@@ -404,22 +442,340 @@ img {
 .admin-ui .admin-pagination [data-slot="select-trigger"],
 .admin-ui [data-slot="button"],
 .admin-ui [data-slot="select-trigger"] {
-  font-size: var(--text-admin-14);
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .admin-ui .admin-stat-card p.font-bold {
-  font-size: var(--text-admin-26);
+  font-size: 2rem;
   line-height: 1.25;
 }
 
+.company-detail-page .admin-status-badge,
+.product-detail-page .admin-status-badge,
+.inquiry-detail-page .admin-status-badge,
+.user-detail-page .admin-status-badge {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.content-list-table [data-slot="table-container"] {
+  overflow: visible;
+}
+
+.content-list-table table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.content-list-table th,
+.content-list-table td {
+  padding: 0.875rem 0.625rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+}
+
+.content-list-table thead {
+  background: var(--muted);
+}
+
+.content-list-table th {
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.content-list-table th:nth-child(1) { width: 5%; }
+.content-list-table th:nth-child(2) { width: 10%; }
+.content-list-table th:nth-child(3) { width: 13%; }
+.content-list-table th:nth-child(4) { width: 16%; }
+.content-list-table th:nth-child(5) { width: 12%; }
+.content-list-table th:nth-child(6) { width: 7%; }
+.content-list-table th:nth-child(7) { width: 9%; }
+.content-list-table th:nth-child(8) { width: 19%; }
+.content-list-table th:nth-child(9) { width: 9%; }
+
+.content-list-table th:first-child,
+.content-list-table td:first-child {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.content-list-table .admin-status-badge {
+  max-width: 100%;
+  white-space: normal;
+}
+
+@media (max-width: 1023px) {
+  .content-list-table table,
+  .content-list-table tbody {
+    display: block;
+  }
+
+  .content-list-table thead {
+    display: none;
+  }
+
+  .content-list-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.5rem;
+  }
+
+  .content-list-table td {
+    display: block;
+    min-width: 0;
+  }
+
+  .content-list-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+}
+
+.company-detail-tables th,
+.company-detail-tables td {
+  padding: 0.875rem 0.625rem;
+  text-align: left;
+  vertical-align: middle;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.company-detail-tables th {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.company-detail-tables th:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.company-detail-tables th:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.company-detail-tables tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.company-detail-tables tbody tr:hover {
+  background: var(--muted);
+}
+
+@media (max-width: 639px) {
+  .company-detail-tables table,
+  .company-detail-tables tbody {
+    display: block;
+  }
+
+  .company-detail-tables thead {
+    display: none;
+  }
+
+  .company-detail-tables tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.5rem 0;
+  }
+
+  .company-detail-tables td {
+    display: block;
+    min-width: 0;
+    padding: 0.5rem;
+  }
+
+  .company-detail-tables td:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .company-detail-tables td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) > .overflow-x-auto,
+:is(.companies-table, .products-table, .inquiries-table, .users-table) [data-slot="table-container"] {
+  overflow-x: visible;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th,
+:is(.companies-table, .products-table, .inquiries-table, .users-table) td {
+  padding: 0.75rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:first-child {
+  width: 26%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(2) {
+  width: 18%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(3) {
+  width: 14%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(4) {
+  width: 10%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(5),
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(6) {
+  width: 12%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:last-child {
+  width: 8%;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:first-child,
+:is(.companies-table, .products-table, .inquiries-table, .users-table) td:first-child {
+  padding-left: 1.25rem;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) th:last-child,
+:is(.companies-table, .products-table, .inquiries-table, .users-table) td:last-child {
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) th:nth-child(n + 4),
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) td:nth-child(n + 4) {
+    text-align: center;
+  }
+}
+
+.inquiries-table th:nth-child(1) { width: 20%; }
+.inquiries-table th:nth-child(2) { width: 17%; }
+.inquiries-table th:nth-child(3) { width: 21%; }
+.inquiries-table th:nth-child(4) { width: 20%; }
+.inquiries-table th:nth-child(5) { width: 15%; }
+.inquiries-table th:nth-child(6) { width: 7%; }
+
+@media (min-width: 768px) {
+  .inquiries-table th:nth-child(4),
+  .inquiries-table td:nth-child(4) {
+    text-align: left;
+  }
+}
+
+.users-table th:nth-child(1) { width: 22%; }
+.users-table th:nth-child(2) { width: 24%; }
+.users-table th:nth-child(3) { width: 12%; }
+.users-table th:nth-child(4) { width: 11%; }
+.users-table th:nth-child(5),
+.users-table th:nth-child(6) { width: 12%; }
+.users-table th:nth-child(7) { width: 7%; }
+
+.products-table th:nth-child(1) { width: 24%; }
+.products-table th:nth-child(2) { width: 17%; }
+.products-table th:nth-child(3) { width: 15%; }
+.products-table th:nth-child(4) { width: 10%; }
+.products-table th:nth-child(5) { width: 14%; }
+.products-table th:nth-child(6),
+.products-table th:nth-child(7) { width: 6%; }
+.products-table th:nth-child(8) { width: 8%; }
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) .admin-status-badge {
+  max-width: 100%;
+  white-space: normal;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) .company-reorder-row {
+  cursor: grab;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) .company-reorder-row [data-company-drag-handle] {
+  cursor: grab;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) [data-drag-source="true"] {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) [data-drop-position] > td {
+  background: var(--accent);
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) [data-drop-position="before"] > td {
+  box-shadow: inset 0 3px 0 var(--primary);
+}
+
+:is(.companies-table, .products-table, .inquiries-table, .users-table) [data-drop-position="after"] > td {
+  box-shadow: inset 0 -3px 0 var(--primary);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) .company-reorder-row > td {
+    transition: background-color 120ms ease, box-shadow 120ms ease;
+  }
+}
+
+@media (max-width: 767px) {
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) table,
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) tbody {
+    display: block;
+  }
+
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) thead {
+    display: none;
+  }
+
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0.5rem;
+  }
+
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) td {
+    display: block;
+    min-width: 0;
+  }
+
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) td:first-child,
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) td[colspan] {
+    grid-column: 1 / -1;
+  }
+
+  :is(.companies-table, .products-table, .inquiries-table, .users-table) td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.375rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+
 .admin-ui .admin-data-table td {
-  font-size: var(--text-admin-15);
+  font-size: 0.875rem;
 }
 
 .admin-ui input,
 .admin-ui textarea {
-  font-size: var(--text-admin-16);
+  font-size: 0.875rem;
 }
 
 .admin-ui .grid > *,

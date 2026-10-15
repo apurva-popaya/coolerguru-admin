@@ -35,7 +35,7 @@ export function DashboardShell({
         } as React.CSSProperties
       }
     >
-      <div className="admin-ui flex min-h-svh w-full min-w-0 flex-col bg-muted/30">
+      <div className="admin-ui flex min-h-svh w-full min-w-0 flex-col bg-primary/7">
         <DashboardNavbar
           user={user}
           homeHref={homeHref}
@@ -46,7 +46,7 @@ export function DashboardShell({
         <div className="flex flex-1">
           <DashboardSidebar navigation={navigation} />
 
-          <main className="admin-content min-w-0 flex-1 px-4 py-5 text-admin-16 sm:px-6 lg:p-6 2xl:p-8">
+          <main className="admin-content min-w-0 flex-1 px-4 py-5 text-sm sm:px-6 lg:p-7 2xl:p-8">
             {children}
           </main>
         </div>

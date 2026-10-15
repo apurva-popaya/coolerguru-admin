@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Loader2, Package, Pencil, Power, PowerOff } from "lucide-react";
+import { Eye, Loader2, MoreHorizontal, Package, Pencil, Power, PowerOff } from "lucide-react";
 
 import { StatusBadge, type StatusVariant } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { updateProductActiveStatus } from "@/lib/api/admin-products-api";
 import type { DataTableFeatures } from "@/lib/data-table-features";
 
@@ -37,22 +44,6 @@ function approvalVariant(status: ProductRow["approvalStatus"]): StatusVariant {
       return "info";
 
     case "Rejected":
-      return "danger";
-
-    default:
-      return "neutral";
-  }
-}
-
-function stockVariant(status: ProductRow["stockStatus"]): StatusVariant {
-  switch (status) {
-    case "In Stock":
-      return "success";
-
-    case "Low Stock":
-      return "warning";
-
-    case "Out of Stock":
       return "danger";
 
     default:
@@ -84,29 +75,23 @@ function ProductActions({ product, onStatusUpdated }: { product: ProductRow; onS
   }
 
   return <div className="flex items-center justify-center gap-2">
-    <Tooltip><TooltipTrigger asChild>
-      <span tabIndex={!product.slug ? 0 : undefined}>
-        {product.slug ? <Button asChild variant="outline" size="icon">
-          <Link href={`/products/${encodeURIComponent(product.slug)}/edit`} aria-label={`Edit ${product.name}`}><Pencil /></Link>
-        </Button> : <Button variant="outline" size="icon" disabled aria-label="Edit product unavailable"><Pencil /></Button>}
-      </span>
-    </TooltipTrigger><TooltipContent>{product.slug ? "Edit product" : "This product is missing its slug."}</TooltipContent></Tooltip>
-    <Tooltip><TooltipTrigger asChild>
-      <span tabIndex={!product.slug ? 0 : undefined}>
-        {product.slug ? <Button asChild variant="outline" size="icon">
-          <Link href={`/products/${encodeURIComponent(product.slug)}`} aria-label={`View ${product.name}`}><Eye /></Link>
-        </Button> : <Button variant="outline" size="icon" disabled aria-label="View product unavailable"><Eye /></Button>}
-      </span>
-    </TooltipTrigger><TooltipContent>{product.slug ? "View product" : "This product has no link. Please correct its missing slug."}</TooltipContent></Tooltip>
-    <Tooltip><TooltipTrigger asChild>
-      <span tabIndex={!canToggle || saving ? 0 : undefined}>
-        <Button type="button" variant={active ? "destructive" : "outline"} size="icon" disabled={!canToggle || saving}
-          aria-label={`${action}: ${product.name}`} aria-busy={saving} onClick={() => setConfirmOpen(true)}>
-          {saving ? <Loader2 className="animate-spin" /> : active ? <PowerOff /> : <Power />}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" disabled={saving} aria-label={`Actions for ${product.name}`}>
+          {saving ? <Loader2 className="animate-spin" /> : <MoreHorizontal />}
         </Button>
-      </span>
-    </TooltipTrigger><TooltipContent>{!product.slug ? "This product is missing its slug." : !canToggle
-      ? "Review and approve this product before changing its listing status." : saving ? "Updating product status..." : action}</TooltipContent></Tooltip>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild disabled={!product.slug}><Link href={product.slug ? `/products/${encodeURIComponent(product.slug)}/edit` : "#"}><Pencil />Edit product</Link></DropdownMenuItem>
+          <DropdownMenuItem asChild disabled={!product.slug}><Link href={product.slug ? `/products/${encodeURIComponent(product.slug)}` : "#"}><Eye />View product</Link></DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem disabled={!canToggle || saving} variant={active ? "destructive" : "default"} onSelect={() => setConfirmOpen(true)}>{active ? <PowerOff /> : <Power />}{action}</DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
     <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!saving) setConfirmOpen(open); }}>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -148,15 +133,15 @@ export function createProductsColumns(onStatusUpdated: () => void): ColumnDef<Da
     header: "Product",
 
     cell: ({ row }) => (
-      <div className="flex min-w-[230px] items-center gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-[8px] border border-border bg-[#fafaff]">
-          <Package className="size-5 text-[#2720a8]" />
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-border bg-muted/50">
+          <Package className="size-5 text-primary" />
         </div>
 
-        <div>
-          <p className="font-semibold text-[#15136f]">{row.original.name}</p>
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-foreground" title={row.original.name}>{row.original.name}</p>
 
-          <p className="mt-1 text-admin-14 text-muted-foreground">{row.original.modelNumber}</p>
+          <p className="mt-1 break-words text-admin-14 text-muted-foreground">{row.original.modelNumber}</p>
         </div>
       </div>
     ),
@@ -178,23 +163,7 @@ export function createProductsColumns(onStatusUpdated: () => void): ColumnDef<Da
     filterFn: "equalsString",
   },
 
-  {
-    accessorKey: "modelNumber",
 
-    header: "Model Number",
-  },
-
-  {
-    accessorKey: "price",
-
-    header: "Price",
-
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap font-medium text-[#15136f]">
-        {row.original.price !== null ? `₹ ${row.original.price.toLocaleString("en-IN")}` : "-"}
-      </span>
-    ),
-  },
 
   {
     accessorKey: "listingStatus",
@@ -210,17 +179,6 @@ export function createProductsColumns(onStatusUpdated: () => void): ColumnDef<Da
     ),
   },
 
-  {
-    accessorKey: "stockStatus",
-
-    header: "Stock",
-
-    filterFn: "equalsString",
-
-    cell: ({ row }) => (
-      <StatusBadge variant={stockVariant(row.original.stockStatus)}>{row.original.stockStatus}</StatusBadge>
-    ),
-  },
 
   {
     accessorKey: "approvalStatus",

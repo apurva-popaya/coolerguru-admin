@@ -30,7 +30,7 @@ export function FeaturedCompaniesFilters({ table }: FeaturedCompaniesFiltersProp
   return (
     <FilterBar>
       <div className="min-w-0 w-full sm:min-w-[260px] sm:w-auto">
-        <label className="mb-2 block font-semibold text-[#15136f] text-admin-14">Featured Status</label>
+        <label className="mb-2 block font-semibold text-foreground text-admin-14">Featured Status</label>
 
         <Select value={getFilterValue("featuredStatus")} onValueChange={(value) => setFilter("featuredStatus", value)}>
           <SelectTrigger className="h-10 w-full min-w-0 sm:min-w-[240px] sm:w-auto">
@@ -48,7 +48,7 @@ export function FeaturedCompaniesFilters({ table }: FeaturedCompaniesFiltersProp
       </div>
 
       <div className="min-w-0 w-full sm:min-w-[260px] sm:w-auto">
-        <label className="mb-2 block font-semibold text-[#15136f] text-admin-14">Business Type</label>
+        <label className="mb-2 block font-semibold text-foreground text-admin-14">Business Type</label>
 
         <Select value={getFilterValue("businessType")} onValueChange={(value) => setFilter("businessType", value)}>
           <SelectTrigger className="h-10 w-full min-w-0 sm:min-w-[240px] sm:w-auto">
@@ -69,7 +69,7 @@ export function FeaturedCompaniesFilters({ table }: FeaturedCompaniesFiltersProp
         <label className="mb-2 block font-semibold text-admin-14 text-transparent">Search</label>
 
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#5d6280]" />
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
           <Input
             value={searchValue}

@@ -28,6 +28,7 @@ export function CompaniesStats({
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
+        layout="summary"
         title="Total Companies"
         value={total}
         icon={Building2}
@@ -35,6 +36,7 @@ export function CompaniesStats({
       />
 
       <StatCard
+        layout="summary"
         title="Verified Companies"
         value={verified}
         icon={CircleCheck}
@@ -42,6 +44,7 @@ export function CompaniesStats({
       />
 
       <StatCard
+        layout="summary"
         title="Pending for verification"
         value={pending}
         icon={Clock3}
@@ -49,6 +52,7 @@ export function CompaniesStats({
       />
 
       <StatCard
+        layout="summary"
         title="Rejected Companies"
         value={rejected}
         icon={CircleX}

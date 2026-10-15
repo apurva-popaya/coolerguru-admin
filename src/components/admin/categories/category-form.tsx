@@ -5,14 +5,16 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { ArrowLeft, ImageIcon, Info, Lightbulb } from "lucide-react";
+import { ArrowLeft, ImageIcon, Info, Loader2 } from "lucide-react";
 
 import { FileUploadField } from "@/components/common/file-upload-field";
 import { SafeImage } from "@/components/common/safe-image";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/lib/api/api-client";
 import { createCategory, getCategoryBySlug, updateCategory } from "@/lib/api/admin-categories-api";
@@ -377,292 +379,124 @@ if (operation === "EDIT" && editSlug) {
 
   if (loading) {
     return (
-      <div className="rounded-[10px] border border-border bg-white px-6 py-10 text-center text-[#5d6280] text-admin-14">
+      <div className="rounded-2xl border border-border bg-card px-6 py-10 text-center text-muted-foreground text-admin-14">
         Loading category...
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
-          <div className="mb-3 flex flex-wrap items-center gap-2 text-admin-14">
-            <Link href="/categories" className="font-medium text-[#2720a8]">
-              Categories
-            </Link>
-
-            {mainCategory && (
-              <>
-                <span className="text-muted-foreground">/</span>
-
-                <span className="text-[#5d6280]">{mainCategory.name}</span>
-              </>
-            )}
-
-            {category && (
-              <>
-                <span className="text-muted-foreground">/</span>
-
-                <span className="text-[#5d6280]">{category.name}</span>
-              </>
-            )}
-
-            <span className="text-muted-foreground">/</span>
-
-            <span className="font-semibold text-[#15136f]">{labels.pageTitle}</span>
-          </div>
-
-          <h1 className="font-bold text-[#15136f] text-admin-28">{labels.pageTitle}</h1>
-
-          <p className="mt-1 text-[#5d6280] text-admin-14">{labels.pageDescription}</p>
-        </div>
-
-        <Button asChild variant="outline" className="gap-2">
-          <Link href="/categories">
-            <ArrowLeft className="size-4" />
-            Back to Categories
-          </Link>
-        </Button>
+    <div className="flex min-w-0 flex-col gap-4">
+      <Link href="/categories" className="inline-flex items-center gap-2 text-sm font-medium text-primary">
+        <ArrowLeft aria-hidden="true" className="size-4" />Back to Categories
+      </Link>
+      <div>
+        <h1 className="text-admin-28 font-bold text-foreground">{labels.pageTitle}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{labels.pageDescription}</p>
       </div>
-
-      {error && (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 font-medium text-admin-14 text-red-600">
-          {error}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.8fr)_minmax(0,0.9fr)]">
-        <form onSubmit={handleSubmit} className="rounded-[10px] border border-border bg-white p-6">
-          <div>
-            <h2 className="font-bold text-[#15136f] text-admin-19">Category Information</h2>
-
-            <p className="mt-1 text-[#5d6280] text-admin-14">
-              {operation === "EDIT" ? "Update the details below." : "Enter the basic details for the new item."}
-            </p>
+      {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <form onSubmit={handleSubmit} className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <div className="border-b border-border px-4 py-4 sm:px-5">
+            <h2 className="text-base font-semibold text-foreground">Category information</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{operation === "EDIT" ? "Update the details below." : "Add the details for your new item."}</p>
           </div>
-
-          <div className="mt-6 space-y-5">
-            {mode !== "MAIN_CATEGORY" && mainCategory && (
-              <ReadOnlyField label="Main Category" value={mainCategory.name} />
-            )}
-
-            {mode === "SUBCATEGORY" && category && <ReadOnlyField label="Category" value={category.name} />}
-
-            <div>
-              <label htmlFor="category-name" className="font-semibold text-[#15136f] text-admin-14">
-                {labels.fieldLabel} <span className="text-red-500">*</span>
-              </label>
-
-              <Input
-                id="category-name"
-                value={name}
-                onChange={(event) => handleNameChange(event.target.value)}
-                placeholder={labels.fieldPlaceholder}
-                className="mt-2 h-11"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="category-slug" className="font-semibold text-[#15136f] text-admin-14">
-                Slug <span className="text-red-500">*</span>
-              </label>
-
-              <Input
-                id="category-slug"
-                value={slug}
-                onChange={(event) => setSlug(createSlug(event.target.value))}
-                placeholder="Enter URL slug"
-                className="mt-2 h-11"
-                required
-              />
-
-              <p className="mt-1 text-admin-14 text-muted-foreground">Use lowercase letters, numbers and hyphens only.</p>
-            </div>
-
-            <div>
-              <label htmlFor="category-description" className="font-semibold text-[#15136f] text-admin-14">
-                Description
-              </label>
-
-              <Textarea
-                id="category-description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value.slice(0, 500))}
-                placeholder="Enter a short description about this category..."
-                className="mt-2 min-h-[125px]"
-              />
-
-              <div className="mt-1 text-right text-admin-14 text-muted-foreground">{description.length}/500</div>
-            </div>
-
-            <div>
-              <label className="font-semibold text-[#15136f] text-admin-14">{labels.imageLabel}</label>
-
-              <div className="mt-2 grid gap-4 md:grid-cols-2">
-                <FileUploadField
-                  size="md"
-                  category="category_image"
-                  label="Upload category image"
-                  items={imageUrl ? [{ key: "category-image", url: imageUrl, name: imageName }] : []}
-                  isUploading={imageBusy && !imageUrl}
-                  busyKeys={imageBusy ? ["category-image"] : []}
-                  disabled={submitting}
-                  onSelect={([file]) => handleImageSelect(file)}
-                  onReplace={(_item, file) => handleImageSelect(file)}
-                  onRemove={handleImageRemove}
-                />
-
-                <div className="rounded-[9px] border border-[#cfe0ff] bg-[#f5f9ff] p-4">
-                  <div className="flex items-center gap-2 text-[#2563eb]">
-                    <Info className="size-5" />
-
-                    <h3 className="font-bold text-admin-14">Image Guidelines</h3>
-                  </div>
-
-                  <ul className="mt-4 list-disc space-y-2 pl-5 text-[#5d6280] text-admin-14 leading-5">
-                    <li>Recommended size: 512 × 512 px</li>
-                    <li>Supported formats: JPG, PNG, WEBP</li>
-                    <li>Maximum file size: {MAX_UPLOAD_SIZE_MB}MB</li>
-                    <li>Images are converted to WEBP automatically.</li>
-                  </ul>
+          <fieldset disabled={submitting} className="min-w-0 p-4 sm:p-5">
+            <FieldGroup className="gap-5">
+              {(mainCategory || category) && (
+                <div className="flex min-w-0 flex-wrap gap-3 rounded-xl bg-muted/50 p-3">
+                  {mode !== "MAIN_CATEGORY" && mainCategory && <ReadOnlyField label="Main category" value={mainCategory.name} />}
+                  {mode === "SUBCATEGORY" && category && <ReadOnlyField label="Parent category" value={category.name} />}
                 </div>
+              )}
+              <FieldGroup className="grid gap-4 md:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="category-name">{labels.fieldLabel} <span aria-hidden="true" className="text-destructive">*</span></FieldLabel>
+                  <Input id="category-name" value={name} onChange={(event) => handleNameChange(event.target.value)} placeholder={labels.fieldPlaceholder} className="h-11 rounded-xl" required />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="category-slug">Slug <span aria-hidden="true" className="text-destructive">*</span></FieldLabel>
+                  <Input id="category-slug" value={slug} onChange={(event) => setSlug(createSlug(event.target.value))} placeholder="Enter URL slug" className="h-11 rounded-xl" aria-describedby="category-slug-hint" required />
+                  <p id="category-slug-hint" className="text-xs text-muted-foreground">Lowercase letters, numbers and hyphens only.</p>
+                </Field>
+              </FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="category-description">Description <span className="font-normal text-muted-foreground">(optional)</span></FieldLabel>
+                <Textarea id="category-description" value={description} onChange={(event) => setDescription(event.target.value.slice(0, 500))}
+                  placeholder="Write a short description..." maxLength={500} aria-describedby="description-count" className="min-h-28 rounded-xl" />
+                <p id="description-count" className="text-right text-xs tabular-nums text-muted-foreground">{description.length}/500</p>
+              </Field>
+              <div className="flex min-w-0 flex-col gap-3 border-t border-border pt-5">
+                <h3 className="text-sm font-medium text-foreground">{labels.imageLabel}</h3>
+                <FileUploadField size="md" category="category_image" label="Upload category image"
+                  items={imageUrl ? [{ key: "category-image", url: imageUrl, name: imageName }] : []}
+                  isUploading={imageBusy && !imageUrl} busyKeys={imageBusy ? ["category-image"] : []}
+                  disabled={submitting} onSelect={([file]) => handleImageSelect(file)}
+                  onReplace={(_item, file) => handleImageSelect(file)} onRemove={handleImageRemove} />
+                <Alert role="note" className="rounded-xl">
+                  <Info aria-hidden="true" />
+                  <AlertDescription>Recommended: 512 x 512 px. JPG, PNG or WEBP, up to {MAX_UPLOAD_SIZE_MB}MB. Images are converted to WEBP automatically.</AlertDescription>
+                </Alert>
               </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label htmlFor="display-order" className="font-semibold text-[#15136f] text-admin-14">
-                  Display Order
-                </label>
-
-                <Input
-  id="display-order"
-  type="number"
-  min="1"
-  value={displayOrder}
-  onChange={(event) => {
-    const value = event.target.value;
-
-    if (value === "") {
-      setDisplayOrder("1");
-      return;
-    }
-
-    const numberValue = Number(value);
-
-    if (numberValue >= 1) {
-      setDisplayOrder(String(numberValue));
-    }
-  }}
-  className="mt-2 h-11"
-/>
-
-                <p className="mt-1 text-admin-14 text-muted-foreground">Lower numbers will appear first.</p>
-              </div>
-
-              <div>
-                <label className="font-semibold text-[#15136f] text-admin-14">Status</label>
-
-                {operation === "EDIT" ? (
-                  <Select value={status} onValueChange={(value) => setStatus(value as "Active" | "Inactive")}>
-                    <SelectTrigger className="mt-2 h-11 w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-
-                    <SelectContent className="text-admin-15 [&_[data-slot=select-item]]:text-admin-15">
-                      <SelectItem value="Active">Active</SelectItem>
-
-                      <SelectItem value="Inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="mt-2 flex h-11 items-center rounded-[7px] border border-border bg-[#f7f7fb] px-3 font-medium text-[#15136f] text-admin-14">
-                    Active
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 border-border border-t pt-5">
-              <Button asChild type="button" variant="outline">
-                <Link href="/categories">Cancel</Link>
-              </Button>
-
-              <Button type="submit" disabled={submitting || imageBusy} className="bg-[#2720a8] px-6 text-white hover:bg-[#15136f]">
-                {submitting ? "Saving..." : labels.submitLabel}
-              </Button>
-            </div>
+              <FieldGroup className="grid gap-4 border-t border-border pt-5 sm:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="display-order">Display order</FieldLabel>
+                  <Input id="display-order" type="number" min="1" value={displayOrder} className="h-11 rounded-xl"
+                    aria-describedby="display-order-hint" onChange={(event) => {
+                      const value = event.target.value;
+                      if (!value) { setDisplayOrder("1"); return; }
+                      if (Number(value) >= 1) setDisplayOrder(String(Number(value)));
+                    }} />
+                  <p id="display-order-hint" className="text-xs text-muted-foreground">Lower numbers appear first.</p>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="category-status">Status</FieldLabel>
+                  {operation === "EDIT" ? (
+                    <Select value={status} onValueChange={(value) => {
+                      if (value === "Active" || value === "Inactive") setStatus(value);
+                    }}>
+                      <SelectTrigger id="category-status" className="w-full rounded-xl data-[size=default]:h-11"><SelectValue /></SelectTrigger>
+                      <SelectContent><SelectGroup><SelectItem value="Active">Active</SelectItem><SelectItem value="Inactive">Inactive</SelectItem></SelectGroup></SelectContent>
+                    </Select>
+                  ) : <Input id="category-status" value="Active" readOnly className="h-11 rounded-xl" />}
+                  {operation === "ADD" && <p className="text-xs text-muted-foreground">New categories start active.</p>}
+                </Field>
+              </FieldGroup>
+            </FieldGroup>
+          </fieldset>
+          <div className="flex flex-col-reverse gap-3 border-t border-border bg-muted/30 px-4 py-4 sm:flex-row sm:justify-end sm:px-5">
+            <Button asChild variant="outline" className="h-10 rounded-xl"><Link href="/categories">Cancel</Link></Button>
+            <Button type="submit" disabled={submitting || imageBusy} className="h-10 rounded-xl px-5">
+              {submitting && <Loader2 data-icon="inline-start" className="animate-spin" />}{submitting ? "Saving..." : labels.submitLabel}
+            </Button>
           </div>
         </form>
-
-        <div className="space-y-5">
-          <div className="rounded-[10px] border border-border bg-white p-5">
-            <h2 className="font-bold text-[#15136f] text-admin-18">Preview</h2>
-
-            <p className="mt-1 text-admin-14 text-muted-foreground">
-              This is how the category will appear in the system.
-            </p>
-
-            <div className="mt-5 rounded-[9px] border border-border p-5">
-              <div className="relative flex size-[95px] items-center justify-center overflow-hidden rounded-[8px] bg-[#edf3ff]">
-                {imageUrl ? (
-                  <SafeImage src={imageUrl} alt={name || "Category image"} fill sizes="95px" className="object-cover" />
-                ) : (
-                  <ImageIcon className="size-8 text-[#5d6280]" />
-                )}
-              </div>
-
-              <h3 className="mt-4 font-bold text-[#15136f] text-admin-18">{name || labels.previewLabel}</h3>
-
-              {mainCategory && (
-                <p className="mt-2 text-admin-14 text-muted-foreground">
-                  Under:{" "}
-                  <span className="font-semibold text-[#15136f]">
-                    {mode === "SUBCATEGORY" ? category?.name : mainCategory.name}
-                  </span>
-                </p>
-              )}
-
-              <p className="mt-2 text-[#5d6280] text-admin-14">0 Products</p>
-
-              <div className="mt-3">
-                <StatusBadge variant={status === "Active" ? "success" : "neutral"}>{status}</StatusBadge>
-              </div>
+        <aside className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm xl:sticky xl:top-28">
+          <div className="border-b border-border p-4 sm:p-5">
+            <h2 className="text-base font-semibold text-foreground">Live preview</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Updates as you fill in the form.</p>
+          </div>
+          <div className="flex min-w-0 flex-col gap-4 p-4 sm:p-5">
+            <div className="relative flex aspect-square max-h-48 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-muted/40">
+              {imageUrl ? <SafeImage src={imageUrl} alt={name || "Category image"} fill sizes="320px" className="object-contain p-3" />
+                : <div className="flex flex-col items-center gap-2 text-muted-foreground"><ImageIcon aria-hidden="true" className="size-8" /><p className="text-xs">No image selected</p></div>}
+            </div>
+            <div className="min-w-0">
+              <h3 className="break-words text-base font-semibold text-foreground">{name || labels.previewLabel}</h3>
+              <p className="mt-1 break-all text-xs text-muted-foreground">{slug || "category-slug"}</p>
+              <p className="mt-3 whitespace-pre-wrap break-words text-sm text-muted-foreground">{description || "Your category description will appear here."}</p>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+              <StatusBadge variant={status === "Active" ? "success" : "neutral"}>{status}</StatusBadge>
+              <span className="text-xs text-muted-foreground">Display order: {displayOrder}</span>
             </div>
           </div>
-
-          <div className="rounded-[10px] border border-border bg-white p-5">
-            <div className="flex items-center gap-2">
-              <Lightbulb className="size-5 text-[#2720a8]" />
-
-              <h2 className="font-bold text-[#15136f] text-admin-16">Quick Tips</h2>
-            </div>
-
-            <ul className="mt-4 list-disc space-y-3 pl-5 text-[#5d6280] text-admin-14 leading-5">
-              <li>Use a clear and relevant name.</li>
-              <li>The slug will be used in the URL.</li>
-              <li>Lower display-order numbers appear first.</li>
-              <li>You can change the status later.</li>
-            </ul>
-          </div>
-        </div>
+        </aside>
       </div>
     </div>
   );
 }
 
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <label className="font-semibold text-[#15136f] text-admin-14">{label}</label>
-
-      <div className="mt-2 flex h-11 items-center rounded-[7px] border border-border bg-[#f7f7fb] px-3 font-medium text-[#15136f] text-admin-14">
-        {value}
-      </div>
-
-      <p className="mt-1 text-admin-14 text-muted-foreground">This parent is fixed for this item.</p>
-    </div>
-  );
+  return <dl className="min-w-0 flex-1"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 break-words text-sm font-medium text-foreground">{value}</dd></dl>;
 }

@@ -1,13 +1,15 @@
 "use client";
 import Link from "next/link";
 import * as React from "react";
+import { cn } from "cn";
 
 import {
   ArrowLeft,
   Building2,
-  Eye,
   Heart,
   IndianRupee,
+  ImageOff,
+  Loader2,
   Package,
   Settings,
   ShieldCheck,
@@ -58,7 +60,7 @@ export function ProductDetail({
 
   const [activeError, setActiveError] = React.useState("");
 
-    async function handleToggleActive() {
+  async function handleToggleActive() {
     if (updatingActive) {
       return;
     }
@@ -87,140 +89,78 @@ export function ProductDetail({
     }
   }
 
+  const canReview = product.approvalStatus === "Pending" || product.approvalStatus === "Under Review";
+
   return (
-    <div className="space-y-5">
-      <Link href="/products" className="inline-flex items-center gap-2 font-medium text-[#2720a8] text-admin-14">
-        <ArrowLeft className="size-4" />
-        Back to Products
+    <div className="product-detail-page flex min-w-0 flex-col gap-4">
+      <Link href="/products" className="inline-flex items-center gap-2 text-sm font-medium text-primary">
+        <ArrowLeft aria-hidden="true" className="size-4" />Back to Products
       </Link>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="rounded-[9px] border border-border bg-white p-5">
-          <div className="flex gap-5">
-            <div className="flex size-[120px] shrink-0 items-center justify-center rounded-[9px] border border-border bg-[#fafaff]">
-              <Package className="size-12 text-[#2720a8]" />
-            </div>
-
-            <div>
-              <h1 className="font-bold text-[#15136f] text-admin-25">{product.name}</h1>
-
-              {product.companyId !== null ? (
-                <Link
-                  href={`/companies/${product.companyId}`}
-                  className="mt-2 inline-flex items-center gap-2 font-semibold text-[#2720a8] text-admin-14"
-                >
-                  <Building2 className="size-4" />
-                  {product.company}
-                </Link>
-              ) : (
-                <p className="mt-2 inline-flex items-center gap-2 text-admin-14 font-semibold text-muted-foreground">
-                  <Building2 className="size-4" />
-                  {product.company}
-                </p>
-              )}
-
-              <p className="mt-2 text-admin-14 text-muted-foreground">Model Number: {product.modelNumber}</p>
-
-              <div className="mt-3 flex gap-2">
-                <StatusBadge variant={approvalVariant(product.approvalStatus)}>{product.approvalStatus}</StatusBadge>
-
-                <StatusBadge
-                  variant={
-                    product.stockStatus === "In Stock"
-                      ? "success"
-                      : product.stockStatus === "Low Stock"
-                        ? "warning"
-                        : "danger"
-                  }
-                >
-                  {product.stockStatus}
-                </StatusBadge>
+      <div className={cn("grid min-w-0 grid-cols-1 items-start gap-4", canReview && "xl:grid-cols-[minmax(0,1fr)_300px]")}>
+        <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+              <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-border bg-accent sm:size-16">
+                <Package aria-hidden="true" className="size-7 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="break-words text-admin-25 font-bold text-foreground">{displayValue(product.name)}</h1>
+                {product.companyId !== null ? (
+                  <Link href={`/companies/${product.companyId}`} className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                    <Building2 aria-hidden="true" className="size-4 shrink-0" />{displayValue(product.company)}
+                  </Link>
+                ) : <p className="mt-2 text-sm text-muted-foreground">No company assigned</p>}
+                <p className="mt-2 text-sm text-muted-foreground">Model: {displayValue(product.modelNumber)}</p>
               </div>
             </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {product.companyId !== null && (
+                <Button asChild variant="outline" className="h-10 rounded-xl">
+                  <Link href={`/companies/${product.companyId}`}><Building2 data-icon="inline-start" />View Company</Link>
+                </Button>
+              )}
+              {approved && (
+                <Button type="button" variant={product.listingStatus === "Active" ? "destructive" : "outline"}
+                  disabled={updatingActive} onClick={() => void handleToggleActive()} className="h-10 rounded-xl">
+                  {updatingActive && <Loader2 data-icon="inline-start" className="animate-spin" />}
+                  {updatingActive ? "Updating..." : product.listingStatus === "Active" ? "Deactivate Product" : "Activate Product"}
+                </Button>
+              )}
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+            <StatusBadge variant={approvalVariant(product.approvalStatus)}>{product.approvalStatus}</StatusBadge>
+            <StatusBadge variant={product.stockStatus === "In Stock" ? "success" : product.stockStatus === "Low Stock" ? "warning" : "danger"}>
+              {displayValue(product.stockStatus)}
+            </StatusBadge>
+            <StatusBadge variant={product.listingStatus === "Active" ? "success" : "neutral"}>{product.listingStatus}</StatusBadge>
           </div>
         </div>
-
-        <ProductAdminDecision product={product} onUpdated={onUpdated} />
+        {canReview && <ProductAdminDecision product={product} onUpdated={onUpdated} />}
       </div>
 
-      {approved && (
-  <div className="flex flex-col items-end gap-2">
-    {activeError ? (
-      <div className="w-full rounded-[6px] border border-red-200 bg-red-50 px-3 py-2 text-admin-14 font-medium text-red-600">
-        {activeError}
-      </div>
-    ) : null}
-
-    <div className="flex justify-end gap-3">
-      {product.companyId !== null ? (
-        <Button asChild variant="outline">
-          <Link href={`/companies/${product.companyId}`}>
-            <Building2 className="size-4" />
-            View Company
-          </Link>
-        </Button>
-      ) : null}
-
-      <Button
-        type="button"
-        variant="outline"
-        disabled={updatingActive}
-        onClick={() => {
-          void handleToggleActive();
-        }}
-        className={
-          product.listingStatus === "Active"
-            ? "border-red-300 text-red-600 hover:bg-red-50"
-            : "border-green-300 text-green-600 hover:bg-green-50"
-        }
-      >
-        {updatingActive
-          ? "Updating..."
-          : product.listingStatus === "Active"
-            ? "Deactivate Product"
-            : "Activate Product"}
-      </Button>
-    </div>
-  </div>
-)}
-
+      {activeError && <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">{activeError}</p>}
       {rejected && (
-        <div className="rounded-[9px] border border-red-200 bg-red-50 p-4">
-          <h2 className="font-bold text-red-700">Product Rejected</h2>
-
-          <p className="mt-2 text-admin-14 text-red-700">{product.rejectionReason}</p>
-
-          {product.rejectedDate ? (
-            <p className="mt-2 text-admin-14 text-muted-foreground">Reviewed on {product.rejectedDate}</p>
-          ) : null}
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-4">
+          <h2 className="font-semibold text-destructive">Product Rejected</h2>
+          <p className="mt-2 text-sm text-destructive">{displayValue(product.rejectionReason)}</p>
+          {product.rejectedDate && <p className="mt-2 text-sm text-muted-foreground">Reviewed on {product.rejectedDate}</p>}
         </div>
       )}
 
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {/* <Metric icon={Eye} label="Views" value={product.views.toLocaleString()} /> */}
-
+      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <Metric icon={Heart} label="Saved Count" value={product.savedCount} />
-
         <Metric icon={ShoppingCart} label="Inquiry Count" value={product.inquiries} />
-
-        <Metric
-          icon={IndianRupee}
-          label="Price"
-          value={product.price !== null ? `₹ ${product.price.toLocaleString("en-IN")}` : "-"}
-        />
-
-        <Metric
-          icon={Warehouse}
-          label="Stock Quantity"
-          value={product.stockQuantity !== null ? `${product.stockQuantity} ${product.stockUnit}` : "-"}
-        />
-
+        <Metric icon={IndianRupee} label="Price" value={product.price !== null ? `₹ ${product.price.toLocaleString("en-IN")}` : "Not provided"} />
+        <Metric icon={Warehouse} label="Stock Quantity" value={product.stockQuantity !== null ? `${product.stockQuantity} ${product.stockUnit}` : "Not provided"} />
         <Metric icon={ShieldCheck} label="Approval" value={product.approvalStatus} />
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-2 xl:grid-cols-3 [&>section]:min-w-0">
-        <DetailSection title="Product Information" icon={<Package className="size-4 text-[#2720a8]" />}>
-          <div className="space-y-3">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 xl:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
+        <DetailSection title="Product Information" icon={<Package className="size-4 text-primary" />}>
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <Info label="Product Name" value={product.name} />
 
             <Info label="Product Slug" value={product.slug} />
@@ -233,58 +173,14 @@ export function ProductDetail({
 
             <Info label="Model Number" value={product.modelNumber} />
 
-            <Info label="Description" value={product.description} />
+            <div className="min-w-0 sm:col-span-2"><Info label="Description" value={product.description} /></div>
 
             <Info label="Created Date" value={product.createdDate} />
 
             <Info label="Updated Date" value={product.updatedDate} />
           </div>
         </DetailSection>
-
-        <DetailSection title="Product Images / Media Gallery" icon={<Package className="size-4 text-[#2720a8]" />}>
-          <div className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
-            {product.images.length > 0 ? (
-              product.images.map((image) => (
-                <div
-                  key={image.id}
-                  className="relative h-40 min-w-0 overflow-hidden rounded-lg border border-border bg-muted sm:h-48"
-                >
-                  <img src={image.url} alt={image.alt} loading="lazy" className="absolute inset-0 size-full object-contain p-3" />
-
-                  {image.isPrimary ? (
-                    <span className="absolute top-2 left-2 rounded bg-primary px-2 py-1 font-semibold text-admin-14 text-primary-foreground">
-                      Primary
-                    </span>
-                  ) : null}
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full flex min-h-40 items-center justify-center rounded-lg border border-border bg-muted">
-                <div className="text-center">
-                  <Package className="mx-auto size-10 text-[#a7a3d7]" />
-
-                  <p className="mt-2 text-admin-14 text-muted-foreground">No product images</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </DetailSection>
-
-        <DetailSection title="Specifications" icon={<Settings className="size-4 text-[#2720a8]" />}>
-          <div className="divide-y divide-border">
-            {product.specifications.map((item) => (
-              <div key={item.label} className="grid grid-cols-2 gap-3 py-2 text-admin-14">
-                <span className="text-muted-foreground">{item.label}</span>
-
-                <span className="font-medium text-[#15136f]">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </DetailSection>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <DetailSection title="Pricing & Inventory" icon={<IndianRupee className="size-4 text-[#2720a8]" />}>
+        <DetailSection title="Pricing & Inventory" icon={<IndianRupee className="size-4 text-primary" />}>
           <div className="grid gap-3 md:grid-cols-2">
             <Info label="Price" value={product.price !== null ? `₹ ${product.price.toLocaleString("en-IN")}` : "-"} />
 
@@ -302,10 +198,39 @@ export function ProductDetail({
             <Info label="Availability" value="Pan India" />
           </div>
         </DetailSection>
+        </div>
+        <div className="flex min-w-0 flex-col gap-4">
+        <DetailSection title="Product Images / Media Gallery" icon={<Package className="size-4 text-primary" />}>
+          {product.images.length > 0 ? (
+            <div className={cn("grid min-w-0 gap-3", product.images.length > 1 && "sm:grid-cols-2")}>
+              {product.images.map((image) => <ProductImage key={image.id} image={image} />)}
+            </div>
+          ) : <MediaPlaceholder message="No product images provided" />}
+        </DetailSection>
+        <DetailSection title="Specifications" icon={<Settings className="size-4 text-primary" />}>
+          {product.specifications.length > 0 ? (
+            <dl className="divide-y divide-border">
+              {product.specifications.map((item) => (
+                <div key={item.label} className="grid min-w-0 grid-cols-2 gap-4 py-3 first:pt-0 last:pb-0">
+                  <dt className="min-w-0 break-words text-sm text-muted-foreground">{item.label}</dt>
+                  <dd className="min-w-0 break-words text-sm font-medium text-foreground">{displayValue(item.value)}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <div className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/40 p-4">
+              <Settings aria-hidden="true" className="size-5 shrink-0 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No specifications provided.</p>
+            </div>
+          )}
+        </DetailSection>
 
-        <DetailSection title="Category & Listing Information" icon={<Package className="size-4 text-[#2720a8]" />}>
-          <div className="space-y-4">
+        </div>
+      </div>
+        <DetailSection title="Category & Listing Information" icon={<Package className="size-4 text-primary" />}>
+          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
+              {product.tags.length === 0 && <p className="text-sm text-muted-foreground">No tags provided.</p>}
               {product.tags.map((tag) => (
                 <StatusBadge key={tag} variant="info">
                   {tag}
@@ -313,7 +238,7 @@ export function ProductDetail({
               ))}
             </div>
 
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
               <Info label="Category" value={product.category} />
 
               <Info label="Product Type" value={product.productType} />
@@ -326,41 +251,13 @@ export function ProductDetail({
             </div>
           </div>
         </DetailSection>
-      </div>
-
-      {/* <DetailSection
-        title="Company Information"
-        icon={<Building2 className="size-4 text-[#2720a8]" />}
-        action={
-          product.companyId ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/companies/${product.companyId}`}>View Company</Link>
-            </Button>
-          ) : null
-        }
-      >
-        <h3 className="font-bold text-[#15136f]">{product.company || "No Company Assigned"}</h3>
-
-        <p className="mt-2 text-admin-14 text-muted-foreground">
-          Supplier company information will later come from the related company API.
-        </p>
-      </DetailSection> */}
-
-      {/* {!approved && !rejected && (
-        <DetailSection title="Admin Notes & Remarks" icon={<ShieldCheck className="size-4 text-[#2720a8]" />}>
-          <textarea
-            className="min-h-[100px] w-full resize-none rounded-[8px] border border-border p-3 text-admin-14 outline-none focus:border-[#2720a8]"
-            placeholder="Add internal notes, comments or review remarks..."
-          />
-        </DetailSection>
-      )} */}
     </div>
   );
 }
 
 function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
   return (
-    <div className="min-w-0 rounded-lg border border-border bg-card p-3 sm:p-4 [&_dd]:wrap-normal [&_dd]:break-normal">
+    <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm">
       <dl className="flex h-full min-w-0 flex-col gap-2">
         <dt className="flex items-center justify-between gap-2 font-medium text-admin-14 text-muted-foreground leading-normal">
           <span className="min-w-0">{label}</span>
@@ -368,7 +265,7 @@ function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: 
             <Icon aria-hidden="true" className="size-4" />
           </span>
         </dt>
-        <dd className="font-bold text-primary text-admin-19 leading-tight tabular-nums">
+        <dd className={cn("font-bold text-primary text-admin-19 leading-tight tabular-nums", value === "Not provided" && "text-sm font-medium text-muted-foreground")}>
           {typeof value === "number" ? value.toLocaleString("en-IN") : value}
         </dd>
       </dl>
@@ -378,10 +275,39 @@ function Metric({ icon: Icon, label, value }: { icon: React.ElementType; label: 
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <p className="text-admin-14 text-muted-foreground">{label}</p>
+    <div className="min-w-0">
+      <p className="text-sm text-muted-foreground">{label}</p>
 
-      <p className="mt-1 font-medium text-[#15136f] text-admin-14">{value}</p>
+      <p className="mt-1 break-words text-sm font-medium text-foreground">{displayValue(value)}</p>
+    </div>
+  );
+}
+
+function displayValue(value: string | null | undefined) {
+  const text = value?.trim();
+  return !text || text === "-" || text === "—" ? "Not provided" : text;
+}
+
+function MediaPlaceholder({ message }: { message: string }) {
+  return (
+    <div className="flex aspect-video min-w-0 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/50 p-5 text-center">
+      <span className="flex size-12 items-center justify-center rounded-full bg-accent text-primary">
+        <ImageOff aria-hidden="true" className="size-6" />
+      </span>
+      <p className="text-sm font-medium text-muted-foreground">{message}</p>
+    </div>
+  );
+}
+
+function ProductImage({ image }: { image: ProductDetailData["images"][number] }) {
+  const [failedUrl, setFailedUrl] = React.useState<string | null>(null);
+  if (!image.url || failedUrl === image.url) return <MediaPlaceholder message="Image unavailable" />;
+
+  return (
+    <div className="relative aspect-video min-w-0 overflow-hidden rounded-xl border border-border bg-muted/40">
+      <img src={image.url} alt={image.alt || "Product image"} loading="lazy"
+        onError={() => setFailedUrl(image.url)} className="absolute inset-0 size-full object-contain p-4" />
+      {image.isPrimary && <div className="absolute left-3 top-3"><StatusBadge variant="info">Primary</StatusBadge></div>}
     </div>
   );
 }

@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -289,7 +290,7 @@ export function AdminCategories() {
         action={
           <Button
             asChild
-            className="gap-2 bg-[#2720a8] hover:bg-[#15136f]"
+            className="gap-2 bg-primary hover:bg-primary/90"
           >
             <Link href="/categories/add-main">
               <Plus className="size-4" />
@@ -300,7 +301,7 @@ export function AdminCategories() {
       />
 
       {error ? (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 font-medium text-admin-14 text-red-600">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-medium text-admin-14 text-red-600">
           {error}
         </div>
       ) : null}
@@ -311,6 +312,7 @@ export function AdminCategories() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard
+          layout="summary"
           title="Main Categories"
           value={categories.length}
           icon={Box}
@@ -318,6 +320,7 @@ export function AdminCategories() {
         />
 
         <StatCard
+          layout="summary"
           title="Categories"
           value={totalCategories}
           icon={Folder}
@@ -325,6 +328,7 @@ export function AdminCategories() {
         />
 
         <StatCard
+          layout="summary"
           title="Subcategories"
           value={totalSubcategories}
           icon={Layers3}
@@ -336,8 +340,8 @@ export function AdminCategories() {
       {/* Categories Table                                                    */}
       {/* ------------------------------------------------------------------ */}
 
-      <div className="overflow-x-auto rounded-[10px] border border-border bg-white">
-        <div className="grid min-w-[1100px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_310px] border-border border-b bg-[#fafafe] px-4 py-3 font-semibold text-[#5d6280] text-admin-14">
+      <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+        <div className="grid min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] border-border border-b bg-muted/60 px-4 py-3 font-semibold text-muted-foreground text-admin-14">
           <div>Category Name</div>
 
           <div>Type</div>
@@ -350,11 +354,11 @@ export function AdminCategories() {
         </div>
 
         {loading ? (
-          <div className="px-6 py-10 text-center text-[#5d6280] text-admin-14">
+          <div className="px-6 py-10 text-center text-muted-foreground text-admin-14">
             Loading categories...
           </div>
         ) : categories.length === 0 ? (
-          <div className="px-6 py-10 text-center text-[#5d6280] text-admin-14">
+          <div className="px-6 py-10 text-center text-muted-foreground text-admin-14">
             No categories found.
           </div>
         ) : (
@@ -388,15 +392,26 @@ function MainCategoryRow({
   onDeactivate: (slug: string, label: string) => void;
   onRestore: (slug: string) => void;
 }) {
+  const [expanded, setExpanded] = React.useState(true);
+  const childrenId = React.useId();
+
   return (
     <div>
-      <div className="grid min-h-[58px] min-w-[1100px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_310px] items-center border-border border-b px-4">
+      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/10 px-4">
         <div className="flex items-center gap-3">
-          <ChevronDown className="size-4" />
+          <Button
+            type="button" variant="ghost" size="icon-sm"
+            aria-expanded={expanded} aria-controls={childrenId}
+            aria-label={`${expanded ? "Collapse" : "Expand"} ${mainCategory.name}`}
+            onClick={() => setExpanded((previous) => !previous)}
+          >
+            <ChevronDown className="transition-transform motion-reduce:transition-none"
+              style={{ transform: expanded ? undefined : "rotate(-90deg)" }} />
+          </Button>
 
-          <Box className="size-5 text-[#2720a8]" />
+          <Box className="size-5 text-primary" />
 
-          <span className="font-bold text-[#15136f]">
+          <span className="font-bold text-foreground">
             {mainCategory.name}
           </span>
         </div>
@@ -411,39 +426,15 @@ function MainCategoryRow({
           <CategoryStatusBadge status={mainCategory.status} />
         </div>
 
-        <div className="text-[#5d6280] text-admin-14">
+        <div className="text-muted-foreground text-admin-14">
           {mainCategory.productsCount}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="gap-2 text-[#2720a8]"
-          >
-            <Link
-              href={`/categories/${mainCategory.slug}/add-category`}
-            >
-              <Plus className="size-4" />
-              Add Category
-            </Link>
-          </Button>
-
-          <Button
-            asChild
-            variant="outline"
-            size="icon-sm"
-          >
-            <Link
-              href={`/categories/${mainCategory.slug}/edit`}
-              aria-label={`Edit ${mainCategory.name}`}
-            >
-              <Edit3 className="size-4" />
-            </Link>
-          </Button>
-
+        <div className="flex items-center">
           <CategoryActions
+            editHref={`/categories/${mainCategory.slug}/edit`}
+            addHref={`/categories/${mainCategory.slug}/add-category`}
+            addLabel="Add Category"
             label={mainCategory.name}
             slug={mainCategory.slug}
             status={mainCategory.status}
@@ -454,6 +445,7 @@ function MainCategoryRow({
         </div>
       </div>
 
+      <div id={childrenId} hidden={!expanded}>
       {mainCategory.categories.length > 0 ? (
         mainCategory.categories.map((category) => (
           <CategoryRow
@@ -466,11 +458,12 @@ function MainCategoryRow({
           />
         ))
       ) : (
-        <div className="border-border border-b bg-[#fbfcff] px-6 py-4 text-[#5d6280] text-admin-14">
+        <div className="border-border border-b bg-muted/40 px-6 py-4 text-muted-foreground text-admin-14">
           No categories added yet. Click “Add Category” to create
           categories under {mainCategory.name}.
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -492,15 +485,26 @@ function CategoryRow({
   onDeactivate: (slug: string, label: string) => void;
   onRestore: (slug: string) => void;
 }) {
+  const [expanded, setExpanded] = React.useState(true);
+  const childrenId = React.useId();
+
   return (
     <>
-      <div className="grid min-h-[58px] min-w-[1100px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_310px] items-center border-border border-b bg-[#fdfdff] px-4">
+      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/5 px-4">
         <div className="flex items-center gap-3 pl-8">
-          <ChevronDown className="size-4" />
+          <Button
+            type="button" variant="ghost" size="icon-sm"
+            aria-expanded={expanded} aria-controls={childrenId}
+            aria-label={`${expanded ? "Collapse" : "Expand"} ${category.name}`}
+            onClick={() => setExpanded((previous) => !previous)}
+          >
+            <ChevronDown className="transition-transform motion-reduce:transition-none"
+              style={{ transform: expanded ? undefined : "rotate(-90deg)" }} />
+          </Button>
 
-          <Folder className="size-5 text-[#2563eb]" />
+          <Folder className="size-5 text-primary" />
 
-          <span className="font-medium text-[#15136f]">
+          <span className="font-medium text-foreground">
             {category.name}
           </span>
         </div>
@@ -515,39 +519,15 @@ function CategoryRow({
           <CategoryStatusBadge status={category.status} />
         </div>
 
-        <div className="text-[#5d6280] text-admin-14">
+        <div className="text-muted-foreground text-admin-14">
           {category.productsCount}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="gap-2 text-[#2720a8]"
-          >
-            <Link
-              href={`/categories/${mainCategory.slug}/${category.slug}/add-subcategory`}
-            >
-              <Plus className="size-4" />
-              Add Subcategory
-            </Link>
-          </Button>
-
-          <Button
-            asChild
-            variant="outline"
-            size="icon-sm"
-          >
-            <Link
-              href={`/categories/${mainCategory.slug}/${category.slug}/edit`}
-              aria-label={`Edit ${category.name}`}
-            >
-              <Edit3 className="size-4" />
-            </Link>
-          </Button>
-
+        <div className="flex items-center">
           <CategoryActions
+            editHref={`/categories/${mainCategory.slug}/${category.slug}/edit`}
+            addHref={`/categories/${mainCategory.slug}/${category.slug}/add-subcategory`}
+            addLabel="Add Subcategory"
             label={category.name}
             slug={category.slug}
             status={category.status}
@@ -558,6 +538,7 @@ function CategoryRow({
         </div>
       </div>
 
+      <div id={childrenId} hidden={!expanded}>
       {category.subcategories.map((subcategory) => (
         <SubcategoryRow
           key={subcategory.id}
@@ -569,6 +550,7 @@ function CategoryRow({
           onRestore={onRestore}
         />
       ))}
+      </div>
     </>
   );
 }
@@ -593,13 +575,13 @@ function SubcategoryRow({
   onRestore: (slug: string) => void;
 }) {
   return (
-    <div className="grid min-h-[56px] min-w-[1100px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_310px] items-center border-border border-b px-4">
+    <div className="grid min-h-[56px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/2 px-4">
       <div className="flex items-center gap-3 pl-[76px]">
         <span className="w-4 border-[#bfc3d5] border-t border-dashed" />
 
-        <Layers3 className="size-4 text-[#5d6280]" />
+        <Layers3 className="size-4 text-muted-foreground" />
 
-        <span className="text-[#15136f] text-admin-14">
+        <span className="text-foreground text-admin-14">
           {subcategory.name}
         </span>
       </div>
@@ -614,26 +596,14 @@ function SubcategoryRow({
         <CategoryStatusBadge status={subcategory.status} />
       </div>
 
-      <div className="text-[#5d6280] text-admin-14">
+      <div className="text-muted-foreground text-admin-14">
         {subcategory.productsCount}
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button
-          asChild
-          variant="outline"
-          size="icon-sm"
-        >
-          <Link
-            href={`/categories/${mainCategory.slug}/${category.slug}/${subcategory.slug}/edit`}
-            aria-label={`Edit ${subcategory.name}`}
-          >
-            <Edit3 className="size-4" />
-          </Link>
-        </Button>
-
-        <CategoryActions
-          label={subcategory.name}
+      <div className="flex items-center">
+          <CategoryActions
+          editHref={`/categories/${mainCategory.slug}/${category.slug}/${subcategory.slug}/edit`}
+            label={subcategory.name}
           slug={subcategory.slug}
           status={subcategory.status}
           loading={actionSlug === subcategory.slug}
@@ -668,6 +638,9 @@ function CategoryStatusBadge({
 /* -------------------------------------------------------------------------- */
 
 function CategoryActions({
+  editHref,
+  addHref,
+  addLabel,
   label,
   slug,
   status,
@@ -675,6 +648,9 @@ function CategoryActions({
   onDeactivate,
   onRestore,
 }: {
+  editHref: string;
+  addHref?: string;
+  addLabel?: string;
   label: string;
   slug: string;
   status: "Active" | "Inactive";
@@ -697,8 +673,17 @@ function CategoryActions({
 
       <DropdownMenuContent
         align="end"
-        className="w-[165px]"
+        className="w-48"
       >
+        <DropdownMenuGroup>
+          {addHref && (
+            <DropdownMenuItem asChild>
+              <Link href={addHref}><Plus />{addLabel}</Link>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem asChild>
+            <Link href={editHref}><Edit3 />Edit</Link>
+          </DropdownMenuItem>
         {status === "Active" ? (
           <DropdownMenuItem
             variant="destructive"
@@ -715,6 +700,7 @@ function CategoryActions({
             Restore
           </DropdownMenuItem>
         )}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

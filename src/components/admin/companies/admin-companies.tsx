@@ -59,8 +59,6 @@ export function AdminCompanies() {
   const [totalItems, setTotalItems] =
     React.useState(0);
 
-  const [filterOptions, setFilterOptions] = React.useState({ businessTypes: [] as string[], locations: [] as string[] });
-
   const [paginationInfo, setPaginationInfo] =
     React.useState({
       page: 1,
@@ -157,10 +155,6 @@ export function AdminCompanies() {
           });
 
           const allRows = apiCompanies.map(mapAdminCompanyToRow);
-          setFilterOptions({
-            businessTypes: [...new Set(apiCompanies.flatMap((company) => [company.company_type, ...(company.business_types ?? [])]).filter((value): value is string => Boolean(value)))].sort(),
-            locations: [...new Set(allRows.map((company) => company.location).filter((value) => value !== "—"))].sort(),
-          });
           const filteredRows = allRows.filter((company) => columnFilters.every(({ id, value }) => {
             const filter = String(value).trim().toLowerCase();
             if (!filter) return true;
@@ -403,7 +397,7 @@ export function AdminCompanies() {
       variant="outline"
       onClick={handleExportCompanies}
       disabled={exporting || loading}
-      className="h-10 gap-2 border-[#cfcdf5] bg-white text-[#2720a8] disabled:cursor-not-allowed disabled:opacity-60"
+      className="h-10 gap-2 border-[#cfcdf5] bg-card text-primary disabled:cursor-not-allowed disabled:opacity-60"
     >
       {exporting ? (
         <Loader2 className="size-4 animate-spin" />
@@ -429,7 +423,6 @@ export function AdminCompanies() {
 
       <CompaniesFilters
         table={table}
-        options={filterOptions}
         activeFilters={columnFilters}
       />
 
@@ -441,14 +434,18 @@ export function AdminCompanies() {
 
       <div>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-bold text-[#15136f] text-admin-17">
+          <h2 className="font-bold text-foreground text-admin-17">
             Companies (
             {totalItems}
             )
           </h2>
 
+          {featured.isUpdating && (
+            <span role="status" className="text-sm text-muted-foreground">Saving featured priorities…</span>
+          )}
+
           {loading && (
-            <div className="flex items-center gap-2 text-[#5d6280] text-admin-15">
+            <div className="flex items-center gap-2 text-muted-foreground text-admin-15">
               <Loader2 className="size-4 animate-spin" />
 
               Loading...
@@ -457,6 +454,57 @@ export function AdminCompanies() {
         </div>
 
         <DataTable
+          className="companies-table"
+          rowProps={(company) => {
+            const canDrag = company.featured && !featured.isUpdating;
+            const isSource = featured.draggedCompanyId === company.companyId;
+            const isTarget = featured.dropTargetCompanyId === company.companyId;
+            const sourceIndex = companies.findIndex((item) => item.companyId === featured.draggedCompanyId);
+            const targetIndex = companies.findIndex((item) => item.companyId === company.companyId);
+
+            return {
+              draggable: canDrag,
+              "aria-busy": featured.isUpdating && company.featured,
+              className: canDrag ? "company-reorder-row" : undefined,
+              "data-drag-source": isSource || undefined,
+              "data-drop-position": isTarget ? (sourceIndex < targetIndex ? "after" : "before") : undefined,
+              onDragStart: (event) => {
+                const target = event.target;
+                if (!canDrag || (target instanceof Element &&
+                    target.closest("button, a, input, select") && !target.closest("[data-company-drag-handle]"))) {
+                  event.preventDefault();
+                  return;
+                }
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", String(company.companyId));
+                const bounds = event.currentTarget.getBoundingClientRect();
+                event.dataTransfer.setDragImage(event.currentTarget, event.clientX - bounds.left, event.clientY - bounds.top);
+                featured.startDrag(company.companyId);
+              },
+              onDragOver: (event) => {
+                if (!canDrag || featured.draggedCompanyId === null || isSource) {
+                  if (featured.dropTargetCompanyId !== null) featured.overDrag(null);
+                  return;
+                }
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                if (!isTarget) featured.overDrag(company.companyId);
+              },
+              onDragLeave: (event) => {
+                if (event.relatedTarget instanceof Node &&
+                    !event.currentTarget.closest("table")?.contains(event.relatedTarget)) {
+                  featured.overDrag(null);
+                }
+              },
+              onDrop: (event) => {
+                if (!canDrag || featured.draggedCompanyId === null || isSource) return;
+                event.preventDefault();
+                featured.drop(company.companyId);
+                featured.resetDrag();
+              },
+              onDragEnd: featured.resetDrag,
+            };
+          }}
           table={table}
           emptyState={{
             title: loading

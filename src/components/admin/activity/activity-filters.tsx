@@ -30,7 +30,7 @@ export function ActivityFilters({ table }: ActivityFiltersProps) {
   return (
     <FilterBar>
       <div className="min-w-0 w-full sm:min-w-[210px] sm:w-auto">
-        <label className="mb-2 block font-semibold text-[#15136f] text-admin-14">User Type</label>
+        <label className="mb-2 block font-semibold text-foreground text-admin-14">User Type</label>
 
         <Select value={getValue("userType")} onValueChange={(value) => setFilter("userType", value)}>
           <SelectTrigger className="h-10 w-full">
@@ -48,7 +48,7 @@ export function ActivityFilters({ table }: ActivityFiltersProps) {
       </div>
 
       <div className="min-w-0 w-full sm:min-w-[230px] sm:w-auto">
-        <label className="mb-2 block font-semibold text-[#15136f] text-admin-14">Activity Type</label>
+        <label className="mb-2 block font-semibold text-foreground text-admin-14">Activity Type</label>
 
         <Select value={getValue("activity")} onValueChange={(value) => setFilter("activity", value)}>
           <SelectTrigger className="h-10 w-full">
@@ -66,10 +66,10 @@ export function ActivityFilters({ table }: ActivityFiltersProps) {
       </div>
 
       <div className="min-w-0 w-full sm:min-w-[220px] sm:w-auto">
-        <label className="mb-2 block font-semibold text-[#15136f] text-admin-14">Date Range</label>
+        <label className="mb-2 block font-semibold text-foreground text-admin-14">Date Range</label>
 
         <div className="relative">
-          <CalendarDays className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#5d6280]" />
+          <CalendarDays className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
           <Input value="All Time" readOnly className="h-10 pl-10" />
         </div>
@@ -79,7 +79,7 @@ export function ActivityFilters({ table }: ActivityFiltersProps) {
         <label className="mb-2 block font-semibold text-admin-14 text-transparent">Search</label>
 
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#5d6280]" />
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
           <Input
             value={searchValue}

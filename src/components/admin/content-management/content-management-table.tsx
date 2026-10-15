@@ -1,12 +1,12 @@
 "use client";
 
-import { RotateCcw, Search } from "lucide-react";
+import { Pencil, RotateCcw, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/common/page-header";
 import { SafeImage } from "@/components/common/safe-image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -14,7 +14,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -30,7 +30,6 @@ import {
   getContentManagement,
 } from "@/lib/api/content-management-api";
 import { ApiError } from "@/lib/api/api-client";
-import { contentManagementClassName } from "./content-management-styles";
 
 /* Add Content UI retained for future use. Restore the Plus import when enabling it.
 function AddContentButton() {
@@ -92,7 +91,7 @@ export function ContentManagementTable() {
   });
 
   return (
-    <div className={contentManagementClassName}>
+    <div className="flex min-w-0 flex-col gap-4">
       <PageHeader
         title="Content Management"
         description="Manage images and content displayed across CoolerGuru."
@@ -110,28 +109,14 @@ export function ContentManagementTable() {
         </Alert>
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
-            <div className="relative w-full sm:max-w-lg">
-              <Search
-                aria-hidden="true"
-                className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground"
-              />
-              <Input
-                aria-label="Search content"
-                placeholder="Search by page, section or content type..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setSearch("")}
-              disabled={!search}
-            >
-              <RotateCcw data-icon="inline-start" />
-              Reset
-            </Button>
+          <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-border bg-card p-4">
+            <InputGroup className="h-11 min-w-0 flex-1 rounded-xl">
+              <InputGroupInput aria-label="Search content" placeholder="Search pages, sections or content types..."
+                value={search} onChange={(event) => setSearch(event.target.value)} className="h-full" />
+              <InputGroupAddon><Search aria-hidden="true" /></InputGroupAddon>
+            </InputGroup>
+            <Button type="button" variant="outline" size="icon" className="size-11 rounded-xl"
+              onClick={() => setSearch("")} disabled={!search} aria-label="Reset search" title="Reset search"><RotateCcw /></Button>
           </div>
           <section
             aria-labelledby="content-sections-heading"
@@ -139,11 +124,11 @@ export function ContentManagementTable() {
           >
             <h2
               id="content-sections-heading"
-              className="font-bold text-primary text-admin-17"
+              className="font-bold text-foreground text-admin-17"
             >
               Content sections{!loading && ` (${filtered.length})`}
             </h2>
-            <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="content-list-table min-w-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               {loading ? (
                 <div
                   role="status"
@@ -194,49 +179,43 @@ export function ContentManagementTable() {
                       );
                       return (
                         <TableRow key={record.id}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>
+                          <TableCell data-label="#">{index + 1}</TableCell>
+                          <TableCell data-label="Page">
                             {contentPages.find(
                               (item) => item.id === record.page,
                             )?.label ?? record.page}
                           </TableCell>
-                          <TableCell>
+                          <TableCell data-label="Section">
                             <span className="font-semibold text-primary">
                               {section?.label ?? record.section}
                             </span>
                           </TableCell>
-                          <TableCell>
+                          <TableCell data-label="Preview">
                             <SafeImage
                               src={record.images[0]?.image_url}
                               alt={`${section?.label ?? record.section} preview`}
                               width={160}
                               height={80}
-                              className="h-20 w-40 rounded-lg border border-border bg-background object-contain"
+                              className="h-16 w-full max-w-40 rounded-lg border border-border bg-muted/40 object-contain"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell data-label="Content Type">
                             {section?.contentTypeLabel ?? record.content_type}
                           </TableCell>
-                          <TableCell>
+                          <TableCell data-label="Images">
                             {record.images.length}{" "}
                             {record.images.length === 1 ? "image" : "images"}
                           </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                record.status === "active"
-                                  ? "default"
-                                  : "secondary"
-                              }
-                            >
+                          <TableCell data-label="Status">
+                            <StatusBadge variant={record.status === "active" ? "success" : "neutral"}>
                               {record.status === null
                                 ? "Unavailable"
                                 : record.status === "active"
                                   ? "Active"
                                   : "Inactive"}
-                            </Badge>
+                            </StatusBadge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell data-label="Updated">
                             <span className="text-muted-foreground">
                               {record.updated_at &&
                               !Number.isNaN(Date.parse(record.updated_at))
@@ -253,13 +232,13 @@ export function ContentManagementTable() {
                                 : "—"}
                             </span>
                           </TableCell>
-                          <TableCell>
-                            <Button asChild variant="outline">
+                          <TableCell data-label="Actions">
+                            <Button asChild variant="ghost" size="icon" title="Edit content">
                               <Link
                                 href={`/content-management/${encodeURIComponent(record.id)}/edit`}
                                 aria-label={`Edit ${section?.label ?? record.section}`}
                               >
-                                Edit
+                                <Pencil />
                               </Link>
                             </Button>
                           </TableCell>

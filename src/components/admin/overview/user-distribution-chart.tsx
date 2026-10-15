@@ -45,16 +45,16 @@ export function UserDistributionChart({
   ];
 
   return (
-    <div className="@container h-full rounded-[8px] border border-[#e3e6f3] bg-white p-4">
+    <div className="@container h-full rounded-2xl border border-border bg-card p-4">
       {/* Header */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-bold text-[#15136f] text-admin-15">
+        <h2 className="font-bold text-foreground text-admin-15">
           User Distribution
         </h2>
 
         <button
           type="button"
-          className="font-semibold text-[#2720a8] text-admin-14"
+          className="font-semibold text-primary text-admin-14"
         >
           View Details
         </button>
@@ -96,11 +96,11 @@ export function UserDistributionChart({
 
           {/* Center Text */}
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-bold text-[#15136f] text-admin-25">
+            <span className="font-bold text-foreground text-admin-25">
               {totalUsers.toLocaleString()}
             </span>
 
-            <span className="text-[#5d6280] text-admin-14">
+            <span className="text-muted-foreground text-admin-14">
               Total Users
             </span>
           </div>
@@ -124,17 +124,17 @@ export function UserDistributionChart({
                 />
 
                 {/* Name */}
-                <span className="min-w-0 truncate font-semibold text-[#15136f]">
+                <span className="min-w-0 truncate font-semibold text-foreground">
                   {item.name}
                 </span>
 
                 {/* Value */}
-                <span className="whitespace-nowrap font-semibold text-[#15136f]">
+                <span className="whitespace-nowrap font-semibold text-foreground">
                   {item.value.toLocaleString()}
                 </span>
 
                 {/* Percentage */}
-                <span className="whitespace-nowrap text-[#5d6280]">
+                <span className="whitespace-nowrap text-muted-foreground">
                   {item.percentage}
                 </span>
               </div>

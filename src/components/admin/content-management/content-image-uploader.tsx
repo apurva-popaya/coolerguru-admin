@@ -31,7 +31,7 @@ function ImagePreview({ image }: { image: ContentImage }) {
       unoptimized={Boolean(image.file)}
       width={480}
       height={240}
-      className="h-36 w-full rounded-md border bg-muted/30 object-contain"
+      className="aspect-[3/1] h-auto w-full rounded-xl border border-border bg-muted/40 object-contain"
     />
   );
 }
@@ -115,6 +115,7 @@ export function ContentImageUploader({
         id="choose-content-images"
         type="button"
         variant="outline"
+        className="h-10 w-fit rounded-xl"
         disabled={disabled}
         aria-invalid={Boolean(error)}
         aria-describedby="content-images-hint"
@@ -135,14 +136,21 @@ export function ContentImageUploader({
       </FieldDescription>
       {error && <FieldError>{error}</FieldError>}
       <div
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 data-[multiple=false]:max-w-160 data-[multiple=false]:grid-cols-1 [&[data-multiple=false]_img]:h-auto! [&[data-multiple=false]_img]:aspect-[3/1]"
+        className="grid min-w-0 gap-4 sm:grid-cols-2 lg:grid-cols-3 data-[multiple=false]:grid-cols-1"
         data-multiple={allowMultiple}
         aria-live="polite"
       >
+        {images.length === 0 && (
+          <div className="col-span-full flex min-h-40 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 p-5 text-center">
+            <Upload aria-hidden="true" className="size-7 text-primary" />
+            <p className="text-sm font-medium text-foreground">No image selected</p>
+            <p className="text-xs text-muted-foreground">Choose an image to preview it here.</p>
+          </div>
+        )}
         {(allowMultiple ? images : images.slice(0, 1)).map((image, index) => (
           <div
             key={image.id}
-            className="flex min-w-0 flex-col gap-3 rounded-lg border p-3"
+            className="flex min-w-0 flex-col gap-3 rounded-xl border border-border p-3"
           >
             <ImagePreview image={image} />
             <p

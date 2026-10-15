@@ -6,28 +6,47 @@ interface StatCardProps {
   icon: LucideIcon;
   trend?: string;
   subtitle?: string;
+  layout?: "default" | "summary";
 }
 
-export function StatCard({ title, value, icon: Icon, trend, subtitle }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, trend, subtitle, layout = "default" }: StatCardProps) {
+  if (layout === "summary") {
+    return (
+      <div className="admin-stat-card rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+            <p className="mt-1 font-bold text-foreground leading-none">{value}</p>
+          </div>
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-primary">
+            <Icon aria-hidden="true" className="size-5" />
+          </div>
+        </div>
+        {subtitle && <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>}
+        {trend && <p className="mt-2 text-sm text-primary">{trend}</p>}
+      </div>
+    );
+  }
+
   return (
-    <div className="admin-stat-card rounded-[10px] border border-border bg-white p-4">
+    <div className="admin-stat-card rounded-2xl border border-border bg-card p-5">
       <div className="flex items-start gap-3">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#f3f2ff]">
-          <Icon className="size-5 text-[#2720a8]" />
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent">
+          <Icon className="size-5 text-primary" />
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-[#11163d] text-[13px]">{title}</p>
+          <p className="font-medium text-foreground text-sm">{title}</p>
 
-          <p className="mt-1 font-bold text-[#15136f] text-[26px] leading-none">{value}</p>
+          <p className="mt-1 font-bold text-foreground text-[26px] leading-none">{value}</p>
 
           {trend && (
-            <div className="mt-2 inline-flex rounded-full bg-[#e8f8ee] px-2 py-[2px] font-semibold text-[#119447] text-[11px]">
+            <div className="mt-2 inline-flex rounded-full bg-[#e8f8ee] px-2 py-[2px] font-semibold text-[#119447] text-xs">
               {trend}
             </div>
           )}
 
-          {subtitle && <p className="mt-1 text-[#5d6280] text-[11px]">{subtitle}</p>}
+          {subtitle && <p className="mt-1 text-muted-foreground text-[11px]">{subtitle}</p>}
         </div>
       </div>
     </div>

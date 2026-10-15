@@ -40,8 +40,16 @@ export function DashboardSidebar({ navigation }: DashboardSidebarProps) {
           state === "expanded" ? "w-[250px] 2xl:w-[280px]" : "w-[62px]",
         )}
       >
-        <div className="sticky top-16 max-h-[calc(100svh-64px)] overflow-y-auto">
+        <div className="sticky top-20 flex h-[calc(100svh-80px)] flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">
           <DashboardNav groups={navigation} />
+          </div>
+          {state === "expanded" && (
+            <div className="m-3 rounded-xl bg-muted p-4">
+              <p className="text-xs font-semibold text-foreground">CoolerGuru Admin</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Manage your platform in one place.</p>
+            </div>
+          )}
         </div>
       </aside>
       <Sheet open={openMobile} onOpenChange={setOpenMobile}>

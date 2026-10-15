@@ -10,14 +10,6 @@ import {
   YAxis,
 } from "recharts";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import type { PlatformGrowthPoint } from "@/lib/api/admin-dashboard-api";
 
 import { platformGrowthData } from "./overview-data";
@@ -50,16 +42,16 @@ export function PlatformGrowthChart({
   };
 
   return (
-    <div className="w-full rounded-[8px] border border-[#e3e6f3] bg-white p-4 sm:p-5 lg:p-6">
+    <div className="w-full rounded-2xl border border-border bg-card p-4 sm:p-5 lg:p-6">
       {/* Header */}
       <div className="mb-4 flex flex-col gap-4 sm:mb-5 sm:flex-row sm:items-start sm:justify-between">
         {/* Title + Legend */}
         <div className="min-w-0">
-          <h2 className="font-bold text-[#15136f] text-admin-15 sm:text-admin-16 lg:text-admin-17">
+          <h2 className="font-bold text-foreground text-admin-15 sm:text-admin-16 lg:text-admin-17">
             Platform Growth
           </h2>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[#5d6280] text-admin-13 sm:text-admin-14">
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-muted-foreground text-admin-13 sm:text-admin-14">
             <Legend
               color="#2563eb"
               label="Companies"
@@ -82,26 +74,6 @@ export function PlatformGrowthChart({
           </div>
         </div>
 
-        {/* Date Filter */}
-        <Select defaultValue="30">
-          <SelectTrigger className="h-10 w-full shrink-0 text-admin-13 sm:w-[135px] sm:text-admin-14">
-            <SelectValue />
-          </SelectTrigger>
-
-          <SelectContent className="text-admin-14 [&_[data-slot=select-item]]:text-admin-14">
-            <SelectItem value="7">
-              Last 7 Days
-            </SelectItem>
-
-            <SelectItem value="30">
-              Last 30 Days
-            </SelectItem>
-
-            <SelectItem value="90">
-              Last 90 Days
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {/* Chart */}

@@ -166,7 +166,7 @@ export function FileUploadField({
           className={cn(
             "flex cursor-pointer items-center justify-center rounded-[6px] border border-[#c6c5eb] border-dashed bg-[#fbfaff] transition hover:bg-[#f7f6ff] focus-within:ring-2 focus-within:ring-[#3024c8]/40",
             classes.dropzone,
-            isDragging && "border-[#3024c8] bg-[#f3f2ff]",
+            isDragging && "border-[#3024c8] bg-accent",
             inputDisabled && "cursor-not-allowed opacity-70",
           )}
         >
@@ -236,7 +236,7 @@ function UploadedItem({
   const showImage = isImageCategory(category) || /\.(jpe?g|png|webp)$/i.test(item.url);
 
   return (
-    <div className={cn("flex items-center rounded-[6px] border border-[#c6c5eb] bg-white", classes.item)}>
+    <div className={cn("flex items-center rounded-[6px] border border-[#c6c5eb] bg-card", classes.item)}>
       {showImage ? (
         <div className={cn("relative shrink-0 overflow-hidden rounded-[4px] bg-[#f4f4fa]", classes.thumb)}>
           <SafeImage src={item.url} alt={name} fill sizes="48px" className="object-cover" />
@@ -264,7 +264,7 @@ function UploadedItem({
               htmlFor={replaceInputId}
               title="Replace file"
               className={cn(
-                "flex cursor-pointer items-center justify-center rounded-full text-[#3024c8] transition hover:bg-[#f3f2ff] focus-within:ring-2 focus-within:ring-[#3024c8]/40",
+                "flex cursor-pointer items-center justify-center rounded-full text-[#3024c8] transition hover:bg-accent focus-within:ring-2 focus-within:ring-[#3024c8]/40",
                 classes.action,
                 disabled && "pointer-events-none opacity-50",
               )}

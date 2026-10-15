@@ -46,30 +46,6 @@ function getVerificationVariant(
   }
 }
 
-function getBusinessTypeVariant(
-  type: CompanyRow["businessType"],
-): StatusVariant {
-  switch (type) {
-    case "Manufacturer":
-      return "info";
-
-    case "Supplier":
-      return "purple";
-
-    case "Exporter":
-      return "info";
-
-    case "Distributor":
-      return "success";
-
-    case "Trader":
-      return "purple";
-
-    default:
-      return "neutral";
-  }
-}
-
 export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFeatured>, onUpdated: () => Promise<void>):
   ColumnDef<
     DataTableFeatures,
@@ -93,8 +69,8 @@ export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFea
     header: "Company",
 
     cell: ({ row }) => (
-      <div className="flex min-w-[210px] items-center gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border border-border bg-[#fafaff]">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted/50">
           {row.original.logo ? (
             <img
               src={row.original.logo}
@@ -102,52 +78,20 @@ export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFea
               className="size-full object-contain"
             />
           ) : (
-            <Building2 className="size-5 text-[#2720a8]" />
+            <Building2 className="size-5 text-primary" />
           )}
         </div>
 
         <div className="min-w-0">
-          <p className="truncate font-semibold text-[#15136f]">
+          <p className="truncate font-semibold text-foreground" title={row.original.name}>
             {row.original.name}
           </p>
 
-          <p className="text-admin-14 text-muted-foreground">
+          <p className="break-words text-admin-14 text-muted-foreground">
             ID: {row.original.companyId}
           </p>
         </div>
       </div>
-    ),
-  },
-
-  {
-    accessorKey: "location",
-
-    header: "Location",
-
-    filterFn: "equalsString",
-
-    cell: ({ row }) => (
-      <span className="text-[#5d6280]">
-        {row.original.location}
-      </span>
-    ),
-  },
-
-  {
-    accessorKey: "businessType",
-
-    header: "Business Type",
-
-    filterFn: "equalsString",
-
-    cell: ({ row }) => (
-      <StatusBadge
-        variant={getBusinessTypeVariant(
-          row.original.businessType,
-        )}
-      >
-        {row.original.businessType}
-      </StatusBadge>
     ),
   },
 
@@ -205,26 +149,11 @@ export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFea
     header: "Products",
 
     cell: ({ row }) => (
-      <span className="font-medium text-[#11163d]">
+      <span className="font-medium text-foreground">
         {
           row.original
             .productsCount
         }
-      </span>
-    ),
-  },
-
-  {
-    accessorKey:
-      "inquiriesReceived",
-
-    header: "Inquiries",
-
-    cell: ({ row }) => (
-      <span className="font-medium text-[#11163d]">
-        {row.original
-          .inquiriesReceived ??
-          "—"}
       </span>
     ),
   },
@@ -265,25 +194,13 @@ export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFea
 
       return (
         <div
-          className="flex items-center gap-2 rounded-md p-1"
-          data-drop-target={featured.dropTargetCompanyId === company.companyId || undefined}
-          onDragOver={(event) => {
-            if (featured.isUpdating || featured.draggedCompanyId === null ||
-                featured.draggedCompanyId === company.companyId) return;
-            event.preventDefault();
-            event.dataTransfer.dropEffect = "move";
-            featured.overDrag(company.companyId);
-          }}
-          onDrop={(event) => {
-            event.preventDefault();
-            if (!featured.isUpdating) featured.drop(company.companyId);
-          }}
+          className="flex flex-wrap items-center gap-1 rounded-md p-1 md:justify-center"
         >
           <Button
             type="button"
             variant="ghost"
             size="icon-sm"
-            draggable={!featured.isUpdating}
+            data-company-drag-handle
             disabled={featured.isUpdating}
             aria-label={`Change ${company.name} featured priority. Use up or down arrow keys, or drag to reorder.`}
             title="Drag to reorder, or focus and press the up or down arrow key"
@@ -293,35 +210,13 @@ export function createCompaniesColumns(featured: ReturnType<typeof useCompanyFea
                 featured.movePriority(company.companyId, event.key === "ArrowUp" ? -1 : 1);
               }
             }}
-            onDragStart={(event) => {
-              event.dataTransfer.effectAllowed = "move";
-              event.dataTransfer.setData("text/plain", String(company.companyId));
-              featured.startDrag(company.companyId);
-            }}
-            onDragEnd={featured.resetDrag}
           >
             <GripVertical />
           </Button>
           <span className="font-medium">{company.featuredPriority ?? "-"}</span>
-          {featured.dropTargetCompanyId === company.companyId && (
-            <span className="text-muted-foreground">Drop here</span>
-          )}
         </div>
       );
     },
-  },
-
-  {
-    accessorKey:
-      "joinedDate",
-
-    header: "Joined Date",
-
-    cell: ({ row }) => (
-      <span className="whitespace-nowrap text-[#5d6280]">
-        {row.original.joinedDate}
-      </span>
-    ),
   },
 
   {

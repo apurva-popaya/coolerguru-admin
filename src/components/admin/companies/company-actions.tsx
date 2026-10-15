@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Loader2, Power, PowerOff, Star } from "lucide-react";
+import { Eye, Loader2, MoreHorizontal, Power, PowerOff, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,7 +9,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { updateAdminCompanyStatus } from "@/lib/api/admin-companies-api";
 import type { CompanyRow } from "./companies-data";
 import type { useCompanyFeatured } from "./use-company-featured";
@@ -52,28 +59,23 @@ export function CompanyActions({ company, featured, onUpdated }: CompanyActionsP
   }
 
   return <div className="flex items-center justify-center gap-2">
-    <Tooltip><TooltipTrigger asChild>
-      <Button asChild variant="outline" size="icon">
-        <Link href={`/companies/${company.companyId}`} aria-label={`View ${company.name}`}><Eye /></Link>
-      </Button>
-    </TooltipTrigger><TooltipContent>View company</TooltipContent></Tooltip>
-    <Tooltip><TooltipTrigger asChild>
-      <span tabIndex={busy ? 0 : undefined}>
-        <Button type="button" variant={company.featured ? "secondary" : "outline"} size="icon" disabled={busy}
-          aria-label={`${featureLabel}: ${company.name}`} aria-pressed={company.featured}
-          onClick={() => setConfirmation("featured")}>
-          <Star fill={company.featured ? "currentColor" : "none"} />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" disabled={busy} aria-label={`Actions for ${company.name}`}>
+          {busy ? <Loader2 className="animate-spin" /> : <MoreHorizontal />}
         </Button>
-      </span>
-    </TooltipTrigger><TooltipContent>{featureLabel}</TooltipContent></Tooltip>
-    <Tooltip><TooltipTrigger asChild>
-      <span tabIndex={busy ? 0 : undefined}>
-        <Button type="button" variant={company.isActive ? "destructive" : "outline"} size="icon" disabled={busy}
-          aria-label={`${statusLabel}: ${company.name}`} onClick={() => setConfirmation("status")}>
-          {company.isActive ? <PowerOff /> : <Power />}
-        </Button>
-      </span>
-    </TooltipTrigger><TooltipContent>{statusLabel}</TooltipContent></Tooltip>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild><Link href={`/companies/${company.companyId}`}><Eye />View company</Link></DropdownMenuItem>
+          <DropdownMenuItem disabled={busy} onSelect={() => setConfirmation("featured")}><Star />{featureLabel}</DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem disabled={busy} variant={company.isActive ? "destructive" : "default"} onSelect={() => setConfirmation("status")}>{company.isActive ? <PowerOff /> : <Power />}{statusLabel}</DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
     <AlertDialog open={confirmation !== null} onOpenChange={(open) => { if (!open && !busy) setConfirmation(null); }}>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -1,6 +1,6 @@
 import type { DashboardNavGroup } from "./types";
 
-export const adminNavigation: DashboardNavGroup[] = [
+const navigationItems: DashboardNavGroup[] = [
   {
     id: "admin",
     label: "ADMIN PANEL",
@@ -76,4 +76,11 @@ export const adminNavigation: DashboardNavGroup[] = [
       },
     ],
   },
+];
+
+export const adminNavigation: DashboardNavGroup[] = [
+  { id: "overview", label: "Overview", items: navigationItems[0].items.slice(0, 1) },
+  { id: "marketplace", label: "Marketplace", items: navigationItems[0].items.slice(1, 3) },
+  { id: "communication", label: "Communication", items: navigationItems[0].items.slice(3, 4) },
+  { id: "administration", label: "Administration", items: navigationItems[0].items.slice(4) },
 ];

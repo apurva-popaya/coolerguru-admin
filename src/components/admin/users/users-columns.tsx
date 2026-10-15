@@ -1,23 +1,16 @@
 "use client";
 
-import Link from "next/link";
 
 import type {
   ColumnDef,
 } from "@tanstack/react-table";
 
-import {
-  Eye,
-} from "lucide-react";
 
 import {
   StatusBadge,
   type StatusVariant,
 } from "@/components/common/status-badge";
 
-import {
-  Button,
-} from "@/components/ui/button";
 
 import type {
   DataTableFeatures,
@@ -89,15 +82,15 @@ export function createUsersColumns({
         "Name",
 
       cell: ({ row }) => (
-        <div className="flex min-w-[190px] items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary text-admin-14">
             {getInitials(
               row.original.name,
             )}
           </div>
 
-          <div>
-            <span className="font-semibold text-foreground">
+          <div className="min-w-0">
+            <span className="break-words font-semibold text-foreground">
               {row.original.name}
             </span>
 
@@ -118,7 +111,7 @@ export function createUsersColumns({
         "Mobile",
 
       cell: ({ row }) => (
-        <div className="min-w-[170px]">
+        <div className="min-w-0">
           <p className="text-muted-foreground">
             {row.original.mobile}
           </p>
@@ -181,7 +174,7 @@ export function createUsersColumns({
         "Joined",
 
       cell: ({ row }) => (
-        <span className="whitespace-nowrap text-muted-foreground">
+        <span className="text-muted-foreground">
           {row.original.joinedDate}
         </span>
       ),
@@ -195,7 +188,7 @@ export function createUsersColumns({
         "Last Activity",
 
       cell: ({ row }) => (
-        <span className="whitespace-nowrap text-muted-foreground">
+        <span className="text-muted-foreground">
           {row.original.lastActivity}
         </span>
       ),
@@ -212,12 +205,6 @@ export function createUsersColumns({
 
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-2">
-          <Button asChild variant="outline" size="icon-sm">
-            <Link href={`/users/${row.original.backendId}`} aria-label={`View ${row.original.name}`}>
-              <Eye className="size-4" />
-            </Link>
-          </Button>
-
           <UserActionsMenu user={row.original} onStatusUpdated={onStatusUpdated} />
         </div>
       ),

@@ -350,19 +350,6 @@ export function AdminInquiries() {
     );
   }
 
-  function handleSearch() {
-    setAppliedSearch(
-      filters.search.trim(),
-    );
-
-    setPagination(
-      (previous) => ({
-        ...previous,
-        pageIndex: 0,
-      }),
-    );
-  }
-
   async function handleExport() {
     setExporting(true);
     setExportError("");
@@ -439,7 +426,7 @@ export function AdminInquiries() {
     <div className="space-y-5">
       <PageHeader
         title="Inquiries"
-        description="Monitor buyer and supplier inquiries across CoolerGuru and track their current status."
+        description="Monitor buyer and supplier inquiries across CoolerGuru"
         action={
           <Button
             type="button"
@@ -447,7 +434,7 @@ export function AdminInquiries() {
             onClick={handleExport}
             disabled={exporting || loading || Boolean(filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo)}
             aria-busy={exporting}
-            className="h-10 gap-2 border-[#cfcdf5] bg-white text-[#2720a8] disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-10 gap-2 border-[#cfcdf5] bg-card text-primary disabled:cursor-not-allowed disabled:opacity-60"
           >
             {exporting ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
             {exporting ? "Exporting..." : "Export Inquiries"}
@@ -458,28 +445,29 @@ export function AdminInquiries() {
       {exportError ? (
         <div
           role="alert"
-          className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600"
+          className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600"
         >
           {exportError}
         </div>
       ) : null}
 
-      <InquiriesStats total={summary.total} newCount={summary.new} spam={summary.spam} />
+      <InquiriesStats total={summary.total} newCount={summary.new} />
 
-      <InquiriesFilters values={filters} onChange={handleFiltersChange} onSearch={handleSearch} onReset={handleReset} />
+      <InquiriesFilters values={filters} onChange={handleFiltersChange} onReset={handleReset} />
 
       {error ? (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
           {error}
         </div>
       ) : null}
 
       <div>
-        <h2 className="mb-3 text-admin-17 font-bold text-[#15136f]">
+        <h2 className="mb-3 text-admin-17 font-bold text-foreground">
           Inquiries ({totalItems})
         </h2>
 
         <DataTable
+          className="inquiries-table"
           table={table}
           emptyState={{
             title:

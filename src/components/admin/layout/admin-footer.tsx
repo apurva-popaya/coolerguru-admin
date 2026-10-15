@@ -104,7 +104,7 @@ const resourceLinks = [
 export function AdminFooter() {
   return (
     <WideContainer>
-      <footer className="w-full overflow-hidden bg-[#07194d] px-marketplace-4 py-marketplace-7 text-white sm:px-marketplace-8 sm:py-marketplace-8 lg:px-marketplace-10">
+      <footer className="w-full overflow-hidden bg-[#07194d] px-marketplace-4 py-marketplace-7 text-primary-foreground sm:px-marketplace-8 sm:py-marketplace-8 lg:px-marketplace-10">
         <div
           className="
             mx-auto w-full max-w-[1600px]
@@ -127,7 +127,7 @@ export function AdminFooter() {
               />
             </Link>
 
-            <p className="mt-3 max-w-[220px] text-marketplace-10 leading-[1.55] text-white/80 sm:text-marketplace-10">
+            <p className="mt-3 max-w-[220px] text-marketplace-10 leading-[1.55] text-primary-foreground/80 sm:text-marketplace-10">
               India&apos;s most comprehensive directory for air cooler
               manufacturers, OEMs, suppliers &amp; exporters.
             </p>
@@ -174,7 +174,7 @@ export function AdminFooter() {
           {/* CONTACT */}
           {/* CONTACT */}
 <div className="min-w-0">
-  <h3 className="font-bold text-marketplace-13 text-white">
+  <h3 className="font-bold text-marketplace-13 text-primary-foreground">
     Contact Us
   </h3>
 
@@ -209,7 +209,7 @@ export function AdminFooter() {
       text="Mon - Sat: 10:00 AM - 6:00 PM"
     />
 
-    {/* <p className="pl-[27px] pt-1 text-marketplace-10 leading-[1.4] text-white/75">
+    {/* <p className="pl-[27px] pt-1 text-marketplace-10 leading-[1.4] text-primary-foreground/75">
       GST: 24AABCC1234D1Z5
     </p> */}
   </div>
@@ -226,7 +226,7 @@ export function AdminFooter() {
               sm:justify-between
             "
           >
-            <p className="text-marketplace-10 leading-[1.5] text-white/65">
+            <p className="text-marketplace-10 leading-[1.5] text-primary-foreground/65">
               © {new Date().getFullYear()} CoolerGuru.com Pvt. Ltd.
               All Rights Reserved.
             </p>
@@ -235,40 +235,40 @@ export function AdminFooter() {
               className="
                 flex flex-wrap items-center
                 gap-x-3 gap-y-2
-                text-marketplace-10 text-white/70
+                text-marketplace-10 text-primary-foreground/70
                 sm:justify-end
               "
             >
               {/* <Link
                 href="#"
-                className="transition hover:text-white"
+                className="transition hover:text-primary-foreground"
               >
                 Sitemap
               </Link> */}
 
-              {/* <span className="text-white/25">|</span> */}
+              {/* <span className="text-primary-foreground/25">|</span> */}
 
               <Link
                 href="https://coolerguru.com/disclaimer"
-                className="transition hover:text-white"
+                className="transition hover:text-primary-foreground"
               >
                 Disclaimer
               </Link>
 
-              <span className="text-white/25">|</span>
+              <span className="text-primary-foreground/25">|</span>
 
               <Link
                 href="https://coolerguru.com/privacy-policy"
-                className="transition hover:text-white"
+                className="transition hover:text-primary-foreground"
               >
                 Privacy Policy
               </Link>
 
-              <span className="text-white/25">|</span>
+              <span className="text-primary-foreground/25">|</span>
 
               <Link
                 href="https://coolerguru.com/terms-and-conditions"
-                className="transition hover:text-white"
+                className="transition hover:text-primary-foreground"
               >
                 Terms &amp; Conditions
               </Link>
@@ -292,7 +292,7 @@ interface FooterColumnProps {
 function FooterColumn({ title, links }: FooterColumnProps) {
   return (
     <div>
-      <h3 className="font-bold text-marketplace-12 text-white">
+      <h3 className="font-bold text-marketplace-12 text-primary-foreground">
         {title}
       </h3>
 
@@ -301,7 +301,7 @@ function FooterColumn({ title, links }: FooterColumnProps) {
           <Link
             key={link.label}
             href={link.href}
-            className="text-marketplace-10 leading-[1.35] text-white/75 transition hover:text-white sm:text-marketplace-10"
+            className="text-marketplace-10 leading-[1.35] text-primary-foreground/75 transition hover:text-primary-foreground sm:text-marketplace-10"
           >
             {link.label}
           </Link>
@@ -328,7 +328,7 @@ function SocialIcon({
       aria-label={label}
       target="_blank"
       rel="noreferrer"
-      className="flex h-[28px] w-[28px] items-center justify-center rounded-full border border-white/20 text-white transition hover:bg-white/10"
+      className="flex h-[28px] w-[28px] items-center justify-center rounded-full border border-white/20 text-primary-foreground transition hover:bg-card/10"
     >
       {children}
     </Link>
@@ -345,8 +345,8 @@ function ContactItem({
   text,
 }: ContactItemProps) {
   return (
-    <div className="flex min-w-0 items-start gap-2.5 text-marketplace-10 leading-[1.4] text-white/80 sm:text-marketplace-10">
-      <span className="mt-px shrink-0 text-white/90">
+    <div className="flex min-w-0 items-start gap-2.5 text-marketplace-10 leading-[1.4] text-primary-foreground/80 sm:text-marketplace-10">
+      <span className="mt-px shrink-0 text-primary-foreground/90">
         {icon}
       </span>
 

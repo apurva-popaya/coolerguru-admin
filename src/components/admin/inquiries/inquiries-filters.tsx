@@ -2,8 +2,8 @@
 
 import { RotateCcw, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AdminInquiryType } from "@/lib/api/admin-inquiries-api";
 
@@ -17,7 +17,6 @@ export interface InquiryFilterValues {
 interface InquiriesFiltersProps {
   values: InquiryFilterValues;
   onChange: (values: InquiryFilterValues) => void;
-  onSearch: () => void;
   onReset: () => void;
 }
 
@@ -27,61 +26,41 @@ const types = [
   { value: "CONTACT_SUPPLIER", label: "Contact Supplier" },
 ] as const;
 
-export function InquiriesFilters({ values, onChange, onSearch, onReset }: InquiriesFiltersProps) {
+export function InquiriesFilters({ values, onChange, onReset }: InquiriesFiltersProps) {
   function updateValue<K extends keyof InquiryFilterValues>(key: K, value: InquiryFilterValues[K]) {
     onChange({ ...values, [key]: value });
   }
-  const invalidDates = Boolean(values.dateFrom && values.dateTo && values.dateFrom > values.dateTo);
   const chips = [
     { key: "search", label: "Search", value: values.search.trim(), reset: "" },
     { key: "inquiryType", label: "Type", value: values.inquiryType === "ALL" ? "" : types.find((item) => item.value === values.inquiryType)?.label, reset: "ALL" },
-    { key: "dateFrom", label: "From", value: values.dateFrom, reset: "" },
-    { key: "dateTo", label: "To", value: values.dateTo, reset: "" },
   ] as const;
 
   return <div className="flex flex-col gap-3">
-    <div className="flex flex-col gap-5 rounded-lg border border-border bg-card p-4 sm:p-5">
-      <form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={(event) => {
-        event.preventDefault();
-        if (!invalidDates) onSearch();
-      }}>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Label htmlFor="inquiry-search" className="text-admin-14">Search inquiries</Label>
-          <div className="relative">
-            <Search aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input id="inquiry-search" value={values.search} onChange={(event) => updateValue("search", event.target.value)}
-              placeholder="Search by inquiry ID, buyer, company or product" className="h-10 pl-10" />
-          </div>
-        </div>
-        <Button type="submit" className="h-10 px-5" disabled={invalidDates}><Search data-icon="inline-start" />Search</Button>
-        <Button type="button" variant="outline" className="h-10" onClick={onReset}><RotateCcw data-icon="inline-start" />Reset filters</Button>
-      </form>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="flex min-w-0 flex-col gap-2">
-          <Label htmlFor="inquiry-type" className="text-admin-14">Inquiry type</Label>
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <FieldGroup className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_2.75rem] xl:grid-cols-[minmax(0,1fr)_13rem_2.75rem]">
+        <Field className="min-w-0 sm:col-span-2 xl:col-span-1">
+          <FieldLabel htmlFor="inquiry-search" className="sr-only">Search inquiries</FieldLabel>
+          <InputGroup className="h-11 rounded-xl">
+            <InputGroupInput id="inquiry-search" value={values.search}
+              onChange={(event) => updateValue("search", event.target.value)} placeholder="Search inquiries..." className="h-full" />
+            <InputGroupAddon><Search aria-hidden="true" /></InputGroupAddon>
+          </InputGroup>
+        </Field>
+        <Field className="min-w-0">
+          <FieldLabel htmlFor="inquiry-type" className="sr-only">Inquiry type</FieldLabel>
           <Select value={values.inquiryType} onValueChange={(value) => {
             const option = types.find((item) => item.value === value);
             if (option) updateValue("inquiryType", option.value);
-          }}><SelectTrigger id="inquiry-type" className="h-10 w-full"><SelectValue /></SelectTrigger>
-            <SelectContent className="[&_[data-slot=select-item]]:text-admin-15"><SelectGroup>
+          }}>
+            <SelectTrigger id="inquiry-type" className="h-11 w-full min-w-0 rounded-xl px-3"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectGroup>
               {types.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
             </SelectGroup></SelectContent>
           </Select>
-        </div>
-        <div className="flex min-w-0 flex-col gap-2">
-          <Label htmlFor="inquiry-date-from" className="text-admin-14">From date</Label>
-          <Input id="inquiry-date-from" type="date" value={values.dateFrom} max={values.dateTo || undefined}
-            aria-invalid={invalidDates} aria-describedby={invalidDates ? "inquiry-date-error" : undefined}
-            onChange={(event) => updateValue("dateFrom", event.target.value)} className="h-10 w-full" />
-        </div>
-        <div className="flex min-w-0 flex-col gap-2">
-          <Label htmlFor="inquiry-date-to" className="text-admin-14">To date</Label>
-          <Input id="inquiry-date-to" type="date" value={values.dateTo} min={values.dateFrom || undefined}
-            aria-invalid={invalidDates} aria-describedby={invalidDates ? "inquiry-date-error" : undefined}
-            onChange={(event) => updateValue("dateTo", event.target.value)} className="h-10 w-full" />
-        </div>
-      </div>
-      {invalidDates && <p id="inquiry-date-error" role="alert" className="text-admin-14 text-destructive">From date must be on or before To date.</p>}
+        </Field>
+        <Button type="button" variant="outline" size="icon" className="size-11 rounded-xl"
+          onClick={onReset} aria-label="Reset filters" title="Reset filters"><RotateCcw /></Button>
+      </FieldGroup>
     </div>
     {chips.some((chip) => chip.value) && <div className="flex flex-wrap items-center gap-2" aria-label="Applied filters">
       <span className="text-admin-14 text-muted-foreground">Applied filters:</span>

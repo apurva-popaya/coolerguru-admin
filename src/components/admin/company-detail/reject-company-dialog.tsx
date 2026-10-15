@@ -115,7 +115,7 @@ export function RejectCompanyDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="admin-ui sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle className="text-[#15136f]">
+          <DialogTitle className="text-foreground">
             Reject Company Verification
           </DialogTitle>
 
@@ -125,7 +125,7 @@ export function RejectCompanyDialog({
         </DialogHeader>
 
         <div className="space-y-3">
-          <label htmlFor="rejection-reason" className="font-semibold text-[#11163d] text-admin-14">
+          <label htmlFor="rejection-reason" className="font-semibold text-foreground text-admin-14">
             Rejection Reason *
           </label>
 
@@ -143,7 +143,7 @@ export function RejectCompanyDialog({
                 Message sent to supplier
               </p>
 
-              <p className="mt-1 text-[#5d6280] text-admin-14">
+              <p className="mt-1 text-muted-foreground text-admin-14">
                 {rejectionReason}
               </p>
             </div>

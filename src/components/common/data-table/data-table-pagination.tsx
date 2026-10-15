@@ -113,8 +113,10 @@ export function DataTablePagination<TData extends RowData>({ table, config }: Da
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
+              aria-disabled={!table.getCanPreviousPage()}
+              tabIndex={!table.getCanPreviousPage() ? -1 : undefined}
               href="#"
-              text=""
+              text="Previous"
               className={!table.getCanPreviousPage() ? "pointer-events-none opacity-50" : undefined}
               onClick={(event) => {
                 preventNavigation(event);
@@ -188,8 +190,10 @@ export function DataTablePagination<TData extends RowData>({ table, config }: Da
 
           <PaginationItem>
             <PaginationNext
+              aria-disabled={!table.getCanNextPage()}
+              tabIndex={!table.getCanNextPage() ? -1 : undefined}
               href="#"
-              text=""
+              text="Next"
               className={!table.getCanNextPage() ? "pointer-events-none opacity-50" : undefined}
               onClick={(event) => {
                 preventNavigation(event);

@@ -91,7 +91,7 @@ export function InquiryDetailPage({
 
   if (loading) {
     return (
-      <div className="rounded-[9px] border border-border bg-white p-10 text-center text-admin-14 text-muted-foreground">
+      <div className="rounded-[9px] border border-border bg-card p-10 text-center text-admin-14 text-muted-foreground">
         Loading inquiry details...
       </div>
     );

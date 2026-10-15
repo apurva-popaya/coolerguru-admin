@@ -83,11 +83,11 @@ export const activityColumns: ColumnDef<DataTableFeatures, ActivityRow>[] = [
 
     cell: ({ row }) => (
       <div className="flex min-w-[210px] items-center gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#edf3ff] font-bold text-[#2720a8] text-admin-14">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#edf3ff] font-bold text-primary text-admin-14">
           {getInitials(row.original.userName)}
         </div>
 
-        <span className="font-semibold text-[#15136f]">{row.original.userName}</span>
+        <span className="font-semibold text-foreground">{row.original.userName}</span>
       </div>
     ),
   },
@@ -120,7 +120,7 @@ export const activityColumns: ColumnDef<DataTableFeatures, ActivityRow>[] = [
             <Icon className="size-4 text-[#2563eb]" />
           </div>
 
-          <span className="font-medium text-[#15136f]">{row.original.activity}</span>
+          <span className="font-medium text-foreground">{row.original.activity}</span>
         </div>
       );
     },
@@ -139,10 +139,10 @@ export const activityColumns: ColumnDef<DataTableFeatures, ActivityRow>[] = [
       return (
         <Link
           href={getItemHref(item)}
-          className="flex min-w-[250px] items-center gap-3 font-medium text-[#2720a8] hover:underline"
+          className="flex min-w-[250px] items-center gap-3 font-medium text-primary hover:underline"
         >
           <div className="flex size-9 shrink-0 items-center justify-center rounded-[7px] bg-[#f3f4fb]">
-            <ItemIcon className="size-4 text-[#5d6280]" />
+            <ItemIcon className="size-4 text-muted-foreground" />
           </div>
 
           <span>{item.itemName}</span>
@@ -156,7 +156,7 @@ export const activityColumns: ColumnDef<DataTableFeatures, ActivityRow>[] = [
 
     header: "Time",
 
-    cell: ({ row }) => <span className="whitespace-nowrap text-[#5d6280]">{row.original.time}</span>,
+    cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{row.original.time}</span>,
   },
 
   {

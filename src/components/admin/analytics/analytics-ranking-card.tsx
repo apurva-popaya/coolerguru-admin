@@ -18,9 +18,9 @@ export function AnalyticsRankingCard({
   type,
 }: AnalyticsRankingCardProps) {
   return (
-    <div className="rounded-[10px] border border-border bg-white p-4">
+    <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-bold text-[#15136f] text-admin-14">
+        <h2 className="font-bold text-foreground text-admin-14">
           {title}
         </h2>
 
@@ -30,7 +30,7 @@ export function AnalyticsRankingCard({
               ? "/products"
               : "/companies"
           }
-          className="font-semibold text-[#2720a8] text-admin-14"
+          className="font-semibold text-primary text-admin-14"
         >
           View All
         </Link>
@@ -46,21 +46,21 @@ export function AnalyticsRankingCard({
           return (
             <div
               key={item.id}
-              className="grid min-h-[43px] grid-cols-[22px_34px_minmax(0,1fr)_auto] items-center gap-2 border-border border-b last:border-b-0"
+              className="grid min-h-14 grid-cols-[22px_34px_minmax(0,1fr)_auto] items-center gap-2 border-border border-b last:border-b-0"
             >
-              <div className="flex size-5 items-center justify-center rounded-full bg-[#f1f2f8] font-semibold text-[#5d6280] text-admin-14">
+              <div className="flex size-5 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground text-admin-14">
                 {index + 1}
               </div>
 
-              <div className="flex size-8 items-center justify-center rounded-[5px] bg-[#f4f5fa]">
-                <Icon className="size-4 text-[#5d6280]" />
+              <div className="flex size-8 items-center justify-center rounded-[5px] bg-accent">
+                <Icon className="size-4 text-primary" />
               </div>
 
-              <span className="truncate font-medium text-[#15136f] text-admin-14">
+              <span className="truncate font-medium text-foreground text-admin-14" title={item.name}>
                 {item.name}
               </span>
 
-              <span className="font-medium text-[#5d6280] text-admin-14">
+              <span className="font-medium text-muted-foreground text-admin-14">
                 {item.value}
               </span>
             </div>
@@ -68,7 +68,7 @@ export function AnalyticsRankingCard({
         })}
 
         {items.length === 0 && (
-          <div className="flex h-[100px] items-center justify-center text-[#5d6280] text-admin-14">
+          <div className="flex h-[100px] items-center justify-center text-muted-foreground text-admin-14">
             No data available
           </div>
         )}

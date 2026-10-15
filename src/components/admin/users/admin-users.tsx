@@ -359,19 +359,6 @@ export function AdminUsers() {
     );
   }
 
-  function handleSearch() {
-    setAppliedSearch(
-      filters.search.trim(),
-    );
-
-    setPagination(
-      (previous) => ({
-        ...previous,
-        pageIndex: 0,
-      }),
-    );
-  }
-
   function handleReset() {
     setFilters(
       initialFilters,
@@ -410,12 +397,12 @@ export function AdminUsers() {
         }
       />
 
-      <UsersFilters values={filters} onChange={handleFiltersChange} onSearch={handleSearch} onReset={handleReset} />
-
       <UsersStats total={summary.total} buyers={summary.buyers} suppliers={summary.suppliers} active={summary.active} inactive={summary.inactive} />
 
+      <UsersFilters values={filters} onChange={handleFiltersChange} onReset={handleReset} />
+
       {error ? (
-        <div className="rounded-[8px] border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-admin-14 font-medium text-red-600">
           {error}
         </div>
       ) : null}
@@ -425,6 +412,7 @@ export function AdminUsers() {
       </p>
 
       <DataTable
+        className="users-table"
         table={table}
         emptyState={{
           title:

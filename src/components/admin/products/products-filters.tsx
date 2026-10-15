@@ -2,8 +2,8 @@
 
 import { RotateCcw, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { AdminProductApprovalStatus, AdminProductStatus, AdminProductStockStatus } from "@/lib/api/admin-products-api";
 
@@ -23,10 +23,7 @@ export interface ProductsFilterValues {
 
 interface ProductsFiltersProps {
   values: ProductsFilterValues;
-  companies: ProductFilterOption[];
-  categories: ProductFilterOption[];
   onChange: (values: ProductsFilterValues) => void;
-  onSearch: () => void;
   onReset: () => void;
 }
 
@@ -34,17 +31,14 @@ function choices(items: [string, string][]): ProductFilterOption[] {
   return items.map(([value, label]) => ({ value, label }));
 }
 
-export function ProductsFilters({ values, companies, categories, onChange, onSearch, onReset }: ProductsFiltersProps) {
+export function ProductsFilters({ values, onChange, onReset }: ProductsFiltersProps) {
   function updateValue<K extends keyof ProductsFilterValues>(key: K, value: ProductsFilterValues[K]) {
     onChange({ ...values, [key]: value });
   }
 
   const selectors: { key: Exclude<keyof ProductsFilterValues, "search">; label: string; options: ProductFilterOption[] }[] = [
-    { key: "companyId", label: "Company", options: [{ value: "ALL", label: "All companies" }, ...companies] },
-    { key: "categoryId", label: "Category", options: [{ value: "ALL", label: "All categories" }, ...categories] },
-    { key: "status", label: "Listing status", options: choices([["ALL", "All listing statuses"], ["ACTIVE", "Active"], ["INACTIVE", "Inactive"]]) },
-    { key: "stockStatus", label: "Stock status", options: choices([["ALL", "All stock statuses"], ["IN_STOCK", "In Stock"], ["LOW_STOCK", "Low Stock"], ["OUT_OF_STOCK", "Out of Stock"]]) },
-    { key: "approvalStatus", label: "Approval status", options: choices([["ALL", "All approval statuses"], ["PENDING", "Pending"], ["UNDER_REVIEW", "Under Review"], ["APPROVED", "Approved"], ["REJECTED", "Rejected"]]) },
+    { key: "status", label: "Listing status", options: choices([["ALL", "All listing status"], ["ACTIVE", "Active"], ["INACTIVE", "Inactive"]]) },
+    { key: "approvalStatus", label: "Approval status", options: choices([["ALL", "All approvals"], ["PENDING", "Pending"], ["UNDER_REVIEW", "Under Review"], ["APPROVED", "Approved"], ["REJECTED", "Rejected"]]) },
   ];
   const active = selectors.filter((selector) => values[selector.key] !== "ALL");
 
@@ -61,33 +55,28 @@ export function ProductsFilters({ values, companies, categories, onChange, onSea
   }
 
   return <div className="flex flex-col gap-3">
-    <div className="flex flex-col gap-5 rounded-lg border border-border bg-card p-4 sm:p-5">
-      <form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={(event) => {
-        event.preventDefault();
-        onSearch();
-      }}>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Label htmlFor="product-search" className="text-admin-14">Search products</Label>
-          <div className="relative">
-            <Search aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input id="product-search" value={values.search} onChange={(event) => updateValue("search", event.target.value)}
-              placeholder="Search by product name, ID, model, SKU, company or category" className="h-10 pl-10" />
-          </div>
-        </div>
-        <Button type="submit" className="h-10 px-5"><Search data-icon="inline-start" />Search</Button>
-        <Button type="button" variant="outline" onClick={onReset} className="h-10"><RotateCcw data-icon="inline-start" />Reset filters</Button>
-      </form>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
-        {selectors.map(({ key, label, options }) => <div key={key} className="flex min-w-0 flex-col gap-2">
-          <Label htmlFor={`product-filter-${key}`} className="text-admin-14">{label}</Label>
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <FieldGroup className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.75rem] xl:grid-cols-[minmax(0,1fr)_11rem_11rem_2.75rem]">
+        <Field className="min-w-0 sm:col-span-3 xl:col-span-1">
+          <FieldLabel htmlFor="product-search" className="sr-only">Search products</FieldLabel>
+          <InputGroup className="h-11 rounded-xl">
+            <InputGroupInput id="product-search" value={values.search}
+              onChange={(event) => updateValue("search", event.target.value)} placeholder="Search products..." className="h-full" />
+            <InputGroupAddon><Search aria-hidden="true" /></InputGroupAddon>
+          </InputGroup>
+        </Field>
+        {selectors.map(({ key, label, options }) => <Field key={key} className="min-w-0">
+          <FieldLabel htmlFor={`product-filter-${key}`} className="sr-only">{label}</FieldLabel>
           <Select value={values[key]} onValueChange={(value) => updateSelect(key, value)}>
-            <SelectTrigger id={`product-filter-${key}`} className="h-10 w-full min-w-0"><SelectValue /></SelectTrigger>
-            <SelectContent className="[&_[data-slot=select-item]]:text-admin-15"><SelectGroup>
+            <SelectTrigger id={`product-filter-${key}`} className="h-11 w-full min-w-0 rounded-xl px-3"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectGroup>
               {options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
             </SelectGroup></SelectContent>
           </Select>
-        </div>)}
-      </div>
+        </Field>)}
+        <Button type="button" variant="outline" size="icon" onClick={onReset}
+          className="size-11 rounded-xl" aria-label="Reset filters" title="Reset filters"><RotateCcw /></Button>
+      </FieldGroup>
     </div>
     {(values.search.trim() || active.length > 0) && <div className="flex flex-wrap items-center gap-2" aria-label="Applied filters">
       <span className="text-admin-14 text-muted-foreground">Applied filters:</span>

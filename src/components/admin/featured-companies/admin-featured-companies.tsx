@@ -794,11 +794,11 @@ export function AdminFeaturedCompanies() {
       )}
 
       {loading ? (
-        <div className="flex min-h-[300px] items-center justify-center rounded-[10px] border border-border bg-white">
+        <div className="flex min-h-[300px] items-center justify-center rounded-2xl border border-border bg-card">
           <div className="flex flex-col items-center gap-3">
             <div className="size-7 animate-spin rounded-full border-2 border-[#2720a8] border-t-transparent" />
 
-            <p className="font-medium text-[#5d6280] text-admin-15">
+            <p className="font-medium text-muted-foreground text-admin-15">
               Loading companies...
             </p>
           </div>

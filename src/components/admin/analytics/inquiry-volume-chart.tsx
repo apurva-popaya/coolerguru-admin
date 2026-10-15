@@ -10,7 +10,9 @@ import {
   YAxis,
 } from "recharts";
 
-import type { InquiryVolumePoint } from "../../../lib/api/admin-analytics-api";
+import type { InquiryVolumePoint } from "@/lib/api/admin-analytics-api";
+
+import { formatChartDate } from "./format-chart-date";
 
 interface InquiryVolumeChartProps {
   data: InquiryVolumePoint[];
@@ -28,19 +30,19 @@ export function InquiryVolumeChart({
   }));
 
   return (
-    <div className="min-h-[300px] rounded-[10px] border border-border bg-white p-4">
+    <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-bold text-[#15136f] text-admin-15">
+        <h2 className="font-bold text-foreground text-admin-15">
           Inquiry Volume
         </h2>
 
-        <span className="text-[#5d6280] text-admin-14">
+        <span className="text-muted-foreground text-admin-14">
           Total{" "}
           {totalInquiries.toLocaleString("en-IN")} inquiries
         </span>
       </div>
 
-      <div className="h-[220px] sm:h-[260px]">
+      <div className="h-64 min-w-0 sm:h-72">
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -61,6 +63,8 @@ export function InquiryVolumeChart({
 
             <XAxis
               dataKey="label"
+              tickFormatter={formatChartDate}
+              interval="preserveStartEnd" minTickGap={32}
               tick={{
                 fontSize: 13,
               }}
@@ -76,11 +80,11 @@ export function InquiryVolumeChart({
               tickLine={false}
             />
 
-            <Tooltip />
+            <Tooltip labelFormatter={(value) => formatChartDate(String(value))} contentStyle={{ borderRadius: "12px", borderColor: "var(--border)", background: "var(--popover)", color: "var(--popover-foreground)" }} />
 
             <Bar
               dataKey="inquiries"
-              fill="#8b85f5"
+              fill="var(--primary)"
               radius={[3, 3, 0, 0]}
             />
           </BarChart>

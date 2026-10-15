@@ -93,11 +93,11 @@ export function ProductAdminDecision({
       <div className="rounded-[9px] border border-[#ddd9ff] bg-[#faf9ff] p-4">
         <div className="mb-4 flex gap-3">
           <div className="flex size-9 items-center justify-center rounded-full bg-[#f0edff]">
-            <ClipboardCheck className="size-4 text-[#2720a8]" />
+            <ClipboardCheck className="size-4 text-primary" />
           </div>
 
           <div>
-            <h2 className="font-bold text-[#15136f] text-admin-15">Admin Decision</h2>
+            <h2 className="font-bold text-foreground text-admin-15">Admin Decision</h2>
 
             <p className="mt-1 text-admin-14 text-muted-foreground">
               Review all product information before making a decision.
@@ -114,7 +114,7 @@ export function ProductAdminDecision({
         <div className="space-y-2">
           <Button
             type="button"
-            className="h-10 w-full gap-2 bg-[#2720a8] hover:bg-[#15136f]"
+            className="h-10 w-full gap-2 bg-primary hover:bg-primary/90"
             disabled={approving || rejecting}
             onClick={() => {
               void handleApprove();

@@ -3,39 +3,36 @@
 import Link from "next/link";
 
 import { useState } from "react";
+import { cn } from "cn";
 
 import {
   ArrowLeft,
   Building2,
   Download,
-  Eye,
   FileText,
   Heart,
+  Loader2,
   MapPin,
   MessageSquare,
   Package,
-  Reply,
   ShieldCheck,
-  Star,
-  Users,
-  Loader2
 } from "lucide-react";
 
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
+import { updateAdminCompanyStatus } from "@/lib/api/admin-companies-api";
 
 import { AdminDecisionPanel } from "./admin-decision-panel";
 import type { CompanyDetailData } from "./company-detail-data";
 import { CompanyHeader } from "./company-header";
 import { DetailSection } from "./detail-section";
-import { updateAdminCompanyStatus } from "@/lib/api/admin-companies-api";
 
 export function CompanyDetail({
   company,
 }: {
   company: CompanyDetailData;
 }) {
-    const [isActive, setIsActive] = useState(
+  const [isActive, setIsActive] = useState(
     company.active,
   );
 
@@ -48,7 +45,7 @@ export function CompanyDetail({
   const isRejected =
     company.verificationStatus === "Rejected";
 
-      const handleToggleCompanyStatus = async () => {
+  const handleToggleCompanyStatus = async () => {
     try {
       setUpdatingStatus(true);
 
@@ -76,12 +73,12 @@ export function CompanyDetail({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="company-detail-page flex flex-col gap-4">
       {/* Back */}
       <div>
         <Link
           href="/companies"
-          className="inline-flex items-center gap-2 font-medium text-[#2720a8] text-admin-14"
+          className="inline-flex items-center gap-2 font-medium text-primary text-admin-14"
         >
           <ArrowLeft className="size-4" />
           Back to Companies
@@ -89,56 +86,22 @@ export function CompanyDetail({
       </div>
 
       {/* Header + Admin Decision */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <CompanyHeader company={company} />
-
-        <AdminDecisionPanel company={company} />
+      <div className={cn("grid grid-cols-1 items-start gap-4", company.verificationStatus === "Pending" && "xl:grid-cols-[minmax(0,1fr)_300px]")}>
+        <CompanyHeader company={company} action={isVerified ? (
+          <Button type="button" variant={isActive ? "destructive" : "outline"}
+            onClick={handleToggleCompanyStatus} disabled={updatingStatus} className="h-10 rounded-xl">
+            {updatingStatus && <Loader2 data-icon="inline-start" className="animate-spin" />}
+            {updatingStatus ? (isActive ? "Deactivating..." : "Activating...")
+              : (isActive ? "Deactivate Company" : "Activate Company")}
+          </Button>
+        ) : undefined} />
+        {company.verificationStatus === "Pending" && <AdminDecisionPanel company={company} />}
       </div>
-
-      {/* Verified company actions */}
-      {isVerified && (
-        <div className="flex flex-wrap justify-end gap-3">
-          {/* <Button
-            className="gap-2 bg-[#2720a8] hover:bg-[#15136f]"
-            type="button"
-          >
-            <Star className="size-4" />
-
-            {company.featured
-              ? "Remove Featured"
-              : "Mark as Featured"}
-          </Button> */}
-
-          <Button
-  variant="outline"
-  type="button"
-  onClick={handleToggleCompanyStatus}
-  disabled={updatingStatus}
-  className={
-    isActive
-      ? "gap-2 border-red-300 text-red-600 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60"
-      : "gap-2 border-green-300 text-green-600 hover:bg-green-50 hover:text-green-600 disabled:cursor-not-allowed disabled:opacity-60"
-  }
->
-  {updatingStatus && (
-    <Loader2 className="size-4 animate-spin" />
-  )}
-
-  {updatingStatus
-    ? isActive
-      ? "Deactivating..."
-      : "Activating..."
-    : isActive
-      ? "Deactivate Company"
-      : "Activate Company"}
-</Button>
-        </div>
-      )}
 
       {/* Rejected company */}
       {isRejected && (
-        <div className="rounded-[9px] border border-red-200 bg-red-50 p-4">
-          <h2 className="font-bold text-admin-14 text-red-700">
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-4">
+          <h2 className="font-bold text-admin-14 text-destructive">
             Company Verification Rejected
           </h2>
 
@@ -189,305 +152,306 @@ export function CompanyDetail({
       </div>
 
       {/* Main Details */}
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        {/* Company Profile */}
-        <DetailSection
-          title="Company Profile"
-          icon={
-            <Building2 className="size-4 text-[#2720a8]" />
-          }
-        >
-          <div className="space-y-5">
-            <div>
-              <h3 className="font-bold text-[#15136f] text-admin-18">
-                {company.name}
-              </h3>
+      <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-4">
+          {/* Company Profile */}
+          <DetailSection
+            title="Company Profile"
+            icon={
+              <Building2 className="size-4 text-primary" />
+            }
+          >
+            <div className="flex flex-col gap-4">
+              <div>
+                <h3 className="font-bold text-foreground text-admin-18">
+                  {company.name}
+                </h3>
 
-              <div className="mt-2 flex items-center gap-2 text-[#5d6280] text-admin-14">
-                <MapPin className="size-4 text-[#2720a8]" />
+                <div className="mt-2 flex items-center gap-2 text-muted-foreground text-admin-14">
+                  <MapPin className="size-4 text-primary" />
 
-                {company.location}
+                  {company.location}
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {company.businessTypes.map((type) => (
+                    <StatusBadge
+                      key={type}
+                      variant="info"
+                    >
+                      {type}
+                    </StatusBadge>
+                  ))}
+
+                  {company.featured && (
+                    <StatusBadge variant="purple">
+                      Featured
+                    </StatusBadge>
+                  )}
+                </div>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {company.businessTypes.map((type) => (
-                  <StatusBadge
-                    key={type}
-                    variant="info"
-                  >
-                    {type}
-                  </StatusBadge>
-                ))}
+              <div className="border-border border-t pt-4">
+                <h4 className="mb-3 font-bold text-foreground text-admin-14">
+                  Supplier Account
+                </h4>
 
-                {company.featured && (
-                  <StatusBadge variant="purple">
-                    Featured
-                  </StatusBadge>
-                )}
+                <div className="grid gap-3 text-admin-14 md:grid-cols-2">
+                  <Info
+                    label="Account Name"
+                    value={company.supplierName}
+                  />
+
+                  <Info
+                    label="Mobile"
+                    value={company.supplierPhone}
+                  />
+
+                  <Info
+                    label="Email"
+                    value={company.supplierEmail}
+                  />
+
+                  <Info
+                    label="Account Status"
+                    value={
+                      isActive
+                        ? "Active"
+                        : "Inactive"
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="border-border border-t pt-4">
+                <Info
+                  label="About Company"
+                  value={company.about}
+                />
               </div>
             </div>
+          </DetailSection>
 
-            <div className="border-border border-t pt-4">
-              <h4 className="mb-3 font-bold text-[#15136f] text-admin-14">
-                Supplier Account
-              </h4>
-
-              <div className="grid gap-3 text-admin-14 md:grid-cols-2">
-                <Info
-                  label="Account Name"
-                  value={company.supplierName}
-                />
-
-                <Info
-                  label="Mobile"
-                  value={company.supplierPhone}
-                />
-
-                <Info
-                  label="Email"
-                  value={company.supplierEmail}
-                />
-
-                <Info
-                  label="Account Status"
-                  value={
-                    isActive
-                      ? "Active"
-                      : "Inactive"
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="border-border border-t pt-4">
+          {/* Business & Address */}
+          <DetailSection
+            title="Business & Address Details"
+            icon={
+              <MapPin className="size-4 text-primary" />
+            }
+          >
+            <div className="grid gap-4 text-admin-14 md:grid-cols-2">
               <Info
-                label="About Company"
-                value={company.about}
+                label="Registered Address"
+                value={company.registeredAddress}
+              />
+
+              <Info
+                label="City"
+                value={company.city}
+              />
+
+              <Info
+                label="State"
+                value={company.state}
+              />
+
+              <Info
+                label="Pincode"
+                value={company.pincode}
+              />
+
+              <Info
+                label="Business Hours"
+                value={company.businessHours}
+              />
+
+              <Info
+                label="Contact Email"
+                value={company.contactEmail}
+              />
+
+              <Info
+                label="Contact Phone"
+                value={company.contactPhone}
+              />
+
+              <Info
+                label="Website"
+                value={company.website}
               />
             </div>
-          </div>
-        </DetailSection>
+          </DetailSection>
 
-        {/* Verification Information */}
-        <DetailSection
-          title="Verification Information"
-          icon={
-            <ShieldCheck className="size-4 text-[#2720a8]" />
-          }
-          action={
-            <StatusBadge
-              variant={
-                isVerified
-                  ? "success"
-                  : company.verificationStatus ===
-                      "Rejected"
-                    ? "danger"
-                    : "warning"
-              }
-            >
-              {company.verificationStatus}
-            </StatusBadge>
-          }
-        >
-          <div className="grid gap-4 text-admin-14 md:grid-cols-2">
-            <Info
-              label="Company Type"
-              value={company.companyType}
-            />
+        </div>
+        <div className="flex min-w-0 flex-col gap-4">
+          {/* Verification Information */}
+          <DetailSection
+            title="Verification Information"
+            icon={
+              <ShieldCheck className="size-4 text-primary" />
+            }
+            action={
+              <StatusBadge
+                variant={
+                  isVerified
+                    ? "success"
+                    : company.verificationStatus ===
+                        "Rejected"
+                      ? "danger"
+                      : "warning"
+                }
+              >
+                {company.verificationStatus}
+              </StatusBadge>
+            }
+          >
+            <div className="grid gap-4 text-admin-14 md:grid-cols-2">
+              <Info
+                label="Company Type"
+                value={company.companyType}
+              />
 
-            <Info
-              label="GST"
-              value={company.gstNumber}
-            />
+              <Info
+                label="GST"
+                value={company.gstNumber}
+              />
 
-            <Info
-              label="PAN"
-              value={company.panNumber}
-            />
+              <Info
+                label="PAN"
+                value={company.panNumber}
+              />
 
-            <Info
-              label="Registration"
-              value={company.registrationNumber}
-            />
+              <Info
+                label="Registration"
+                value={company.registrationNumber}
+              />
 
-            <Info
-              label="Years in Business"
-              value={company.yearsInBusiness}
-            />
+              <Info
+                label="Years in Business"
+                value={company.yearsInBusiness}
+              />
 
-            <Info
-              label="Employee Size"
-              value={company.employeeSize}
-            />
+              <Info
+                label="Employee Size"
+                value={company.employeeSize}
+              />
 
-            <Info
-              label="Joined Date"
-              value={company.joinedDate}
-            />
+              <Info
+                label="Joined Date"
+                value={company.joinedDate}
+              />
 
-            <Info
-              label="Verification Submitted"
-              value={company.verificationSubmitted}
-            />
-          </div>
-        </DetailSection>
+              <Info
+                label="Verification Submitted"
+                value={company.verificationSubmitted}
+              />
+            </div>
+          </DetailSection>
 
-        {/* Business & Address */}
-        <DetailSection
-          title="Business & Address Details"
-          icon={
-            <MapPin className="size-4 text-[#2720a8]" />
-          }
-        >
-          <div className="grid gap-4 text-admin-14 md:grid-cols-2">
-            <Info
-              label="Registered Address"
-              value={company.registeredAddress}
-            />
+          {/* Verification Documents */}
+          <DetailSection
+            title="Verification Documents"
+            icon={
+              <FileText className="size-4 text-primary" />
+            }
+          >
+            {company.documents.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {company.documents.map((document) => (
+                  <div
+                    key={document.id}
+                    className="rounded-2xl border border-border bg-muted/40 p-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-foreground text-admin-14">
+                          {document.name}
+                        </p>
+                      </div>
 
-            <Info
-              label="City"
-              value={company.city}
-            />
-
-            <Info
-              label="State"
-              value={company.state}
-            />
-
-            <Info
-              label="Pincode"
-              value={company.pincode}
-            />
-
-            <Info
-              label="Business Hours"
-              value={company.businessHours}
-            />
-
-            <Info
-              label="Contact Email"
-              value={company.contactEmail}
-            />
-
-            <Info
-              label="Contact Phone"
-              value={company.contactPhone}
-            />
-
-            <Info
-              label="Website"
-              value={company.website}
-            />
-          </div>
-        </DetailSection>
-
-        {/* Verification Documents */}
-        <DetailSection
-          title="Verification Documents"
-          icon={
-            <FileText className="size-4 text-[#2720a8]" />
-          }
-        >
-          {company.documents.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {company.documents.map((document) => (
-                <div
-                  key={document.id}
-                  className="rounded-[8px] border border-border bg-[#fcfcff] p-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-[#15136f] text-admin-14">
-                        {document.name}
-                      </p>
-                    </div>
-
-                    <Button
-                      asChild
-                      size="icon-sm"
-                      variant="outline"
-                    >
-                      <a
-                        href={document.url}
-                        target="_blank"
-                        rel="noreferrer"
+                      <Button
+                        asChild
+                        size="icon-sm"
+                        variant="outline"
+                        aria-label={`Open ${document.name}`}
                       >
-                        <Download className="size-4" />
-                      </a>
-                    </Button>
+                        <a
+                          href={document.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Download />
+                        </a>
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-admin-14">
+                No verification documents available.
+              </p>
+            )}
+          </DetailSection>
+        {/* Products & Categories */}
+        <DetailSection
+          title="Categories"
+          icon={
+            <Package className="size-4 text-primary" />
+          }
+        >
+          {company.categories.length > 0 ? (
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {company.categories.map((category) => (
+                  <StatusBadge
+                    key={category}
+                    variant="info"
+                  >
+                    {category}
+                  </StatusBadge>
+                ))}
+              </div>
             </div>
           ) : (
-            <p className="text-[#5d6280] text-admin-14">
-              No verification documents available.
+            <p className="text-muted-foreground text-admin-14">
+              No categories found for this company.
             </p>
           )}
         </DetailSection>
+
+        </div>
       </div>
 
-      {/* Products & Categories */}
-      <DetailSection
-        title="Categories"
-        icon={
-          <Package className="size-4 text-[#2720a8]" />
-        }
-      >
-        {company.categories.length > 0 ? (
-          <div>
-            <p className="mb-3 font-semibold text-[#15136f] text-admin-14">
-              Categories
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {company.categories.map((category) => (
-                <StatusBadge
-                  key={category}
-                  variant="info"
-                >
-                  {category}
-                </StatusBadge>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <p className="text-[#5d6280] text-admin-14">
-            No categories found for this company.
-          </p>
-        )}
-      </DetailSection>
-
       {/* Recent Products + Inquiries */}
-      <div className="grid min-w-0 grid-cols-1 items-start gap-4 2xl:grid-cols-2 [&_thead]:bg-muted [&_th]:px-4 [&_th]:py-3.5 [&_th]:text-left [&_th]:align-middle [&_th]:font-semibold [&_th]:text-primary [&_th]:leading-normal [&_th]:whitespace-nowrap [&_td]:px-4 [&_td]:py-3.5 [&_td]:text-left [&_td]:align-middle [&_td]:leading-normal [&_td]:wrap-anywhere [&_tbody_tr:nth-child(even)]:bg-muted [&_tbody_tr:last-child]:border-b-0 [&_.admin-status-badge]:shrink-0 [&_.admin-status-badge]:whitespace-nowrap [&_.admin-status-badge]:wrap-normal [&_.admin-status-badge]:break-normal">
+      <div className="company-detail-tables grid min-w-0 grid-cols-1 items-start gap-4 2xl:grid-cols-2">
         <DetailSection
           title="Recent Products"
           className="min-w-0 overflow-hidden"
           icon={
-            <Package className="size-4 text-[#2720a8]" />
+            <Package className="size-4 text-primary" />
           }
         >
           {company.products.length > 0 ? (
-            <div className="overflow-x-auto rounded-lg border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" tabIndex={0} role="region" aria-label="Recent products table">
-              <table className="w-full min-w-[620px] table-fixed border-collapse [&_td:last-child]:whitespace-nowrap [&_td:last-child]:wrap-normal">
+            <div className="min-w-0" role="region" aria-label="Recent products table">
+              <table className="w-full table-fixed border-collapse">
                 <caption className="sr-only">Recent products for {company.name}</caption>
-                <colgroup><col className="w-[34%]" /><col className="w-[27%]" /><col className="w-[16%]" /><col className="w-[23%]" /></colgroup>
+                <colgroup><col className="w-[30%]" /><col className="w-1/4" /><col className="w-1/5" /><col className="w-1/4" /></colgroup>
                 <thead>
-                  <tr className="border-border border-b text-left text-[#5d6280] text-admin-14">
-                    <th className="pb-3">
+                  <tr className="border-border border-b text-left text-muted-foreground text-admin-14">
+                    <th scope="col" className="pb-3">
                       Product
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Category
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Status
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Price
                     </th>
                   </tr>
@@ -500,15 +464,15 @@ export function CompanyDetail({
                         key={product.id}
                         className="border-border/60 border-b text-admin-14"
                       >
-                        <td className="py-3 font-semibold text-[#15136f]">
+                        <td data-label="Product" className="py-3 font-semibold text-foreground">
                           {product.name}
                         </td>
 
-                        <td className="py-3 text-[#5d6280]">
+                        <td data-label="Category" className="py-3 text-muted-foreground">
                           {product.category}
                         </td>
 
-                        <td className="py-3">
+                        <td data-label="Status" className="py-3">
                           <StatusBadge
                             variant={
                               product.status ===
@@ -521,7 +485,7 @@ export function CompanyDetail({
                           </StatusBadge>
                         </td>
 
-                        <td className="py-3 text-[#15136f]">
+                        <td data-label="Price" className="py-3 text-foreground">
                           {product.price}
                         </td>
                       </tr>
@@ -531,7 +495,7 @@ export function CompanyDetail({
               </table>
             </div>
           ) : (
-            <p className="text-[#5d6280] text-admin-14">
+            <p className="text-muted-foreground text-admin-14">
               No products found for this company.
             </p>
           )}
@@ -541,29 +505,29 @@ export function CompanyDetail({
           title="Recent Inquiries"
           className="min-w-0 overflow-hidden"
           icon={
-            <MessageSquare className="size-4 text-[#2720a8]" />
+            <MessageSquare className="size-4 text-primary" />
           }
         >
           {company.inquiries.length > 0 ? (
-            <div className="overflow-x-auto rounded-lg border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" tabIndex={0} role="region" aria-label="Recent inquiries table">
-              <table className="w-full min-w-[660px] table-fixed border-collapse">
+            <div className="min-w-0" role="region" aria-label="Recent inquiries table">
+              <table className="w-full table-fixed border-collapse">
                 <caption className="sr-only">Recent inquiries for {company.name}</caption>
-                <colgroup><col className="w-[23%]" /><col className="w-1/4" /><col className="w-[36%]" /><col className="w-[16%]" /></colgroup>
+                <colgroup><col className="w-1/5" /><col className="w-[27%]" /><col className="w-[33%]" /><col className="w-1/5" /></colgroup>
                 <thead>
-                  <tr className="border-border border-b text-left text-[#5d6280] text-admin-14">
-                    <th className="pb-3">
+                  <tr className="border-border border-b text-left text-muted-foreground text-admin-14">
+                    <th scope="col" className="pb-3">
                       Buyer
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Inquiry
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Response
                     </th>
 
-                    <th className="pb-3">
+                    <th scope="col" className="pb-3">
                       Status
                     </th>
                   </tr>
@@ -576,19 +540,19 @@ export function CompanyDetail({
                         key={inquiry.id}
                         className="border-border/60 border-b text-admin-14"
                       >
-                        <td className="py-3 font-semibold text-[#15136f]">
+                        <td data-label="Buyer" className="py-3 font-semibold text-foreground">
                           {inquiry.buyer}
                         </td>
 
-                        <td className="py-3 text-[#5d6280]">
+                        <td data-label="Inquiry" className="py-3 text-muted-foreground">
                           {inquiry.inquiry}
                         </td>
 
-                        <td className="py-3 text-[#5d6280]">
+                        <td data-label="Response" className="py-3 text-muted-foreground">
                           {inquiry.response}
                         </td>
 
-                        <td className="py-3">
+                        <td data-label="Status" className="py-3">
                           <StatusBadge
                             variant={
                               inquiry.status ===
@@ -610,7 +574,7 @@ export function CompanyDetail({
               </table>
             </div>
           ) : (
-            <p className="text-[#5d6280] text-admin-14">
+            <p className="text-muted-foreground text-admin-14">
               No inquiries found for this company.
             </p>
           )}
@@ -622,12 +586,12 @@ export function CompanyDetail({
         <DetailSection
           title="Admin Notes & Remarks"
           icon={
-            <Users className="size-4 text-[#2720a8]" />
+            <Users className="size-4 text-primary" />
           }
         >
           <textarea
             placeholder="Add your review notes, comments or rejection reason here..."
-            className="min-h-[100px] w-full resize-none rounded-[8px] border border-border p-3 text-admin-14 outline-none focus:border-[#2720a8]"
+            className="min-h-[100px] w-full resize-none rounded-2xl border border-border p-3 text-admin-14 outline-none focus:border-[#2720a8]"
           />
         </DetailSection>
       )} */}
@@ -645,7 +609,7 @@ function Metric({
   value: number;
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-5">
+    <div className="min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="flex h-full items-start justify-between gap-3">
         <dl className="flex min-w-0 flex-col gap-2">
           <dt className="font-medium text-muted-foreground text-admin-14 leading-normal">
@@ -673,11 +637,11 @@ function Info({
 }) {
   return (
     <div>
-      <p className="font-medium text-[#5d6280] text-admin-14">
+      <p className="font-medium text-muted-foreground text-admin-14">
         {label}
       </p>
 
-      <p className="mt-1 font-medium text-[#15136f] text-admin-14">
+      <p className="mt-1 font-medium text-foreground text-admin-14">
         {value}
       </p>
     </div>

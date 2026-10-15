@@ -1,5 +1,7 @@
 import { CircleCheck, Store, UserRound, UserX, Users } from "lucide-react";
 
+import { StatCard } from "@/components/common/stat-card";
+
 interface UsersStatsProps {
   total: number;
   buyers: number;
@@ -17,16 +19,10 @@ export function UsersStats({ total, buyers, suppliers, active, inactive }: Users
     { title: "Inactive Users", value: inactive, icon: UserX },
   ];
   return (
-    <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-      {stats.map(({ title, value, icon: Icon }) => (
-        <div key={title} className="relative min-w-0 rounded-lg border border-border bg-card p-4">
-          <dt className="pr-10 text-admin-14 font-medium text-muted-foreground">{title}</dt>
-          <dd className="mt-3 text-admin-24 font-bold leading-tight text-primary">{value.toLocaleString("en-IN")}</dd>
-          <div className="absolute top-4 right-4 flex size-8 items-center justify-center rounded-lg bg-primary/10">
-            <Icon aria-hidden="true" className="size-4 text-primary" />
-          </div>
-        </div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {stats.map(({ title, value, icon }) => (
+        <StatCard key={title} layout="summary" title={title} value={value} icon={icon} />
       ))}
-    </dl>
+    </div>
   );
 }

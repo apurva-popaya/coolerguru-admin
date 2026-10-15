@@ -9,28 +9,29 @@ interface StatusBadgeProps {
 }
 
 const variants: Record<StatusVariant, string> = {
-  success: "bg-[#e8f8ee] text-[#119447]",
+  success: "bg-emerald-50 text-emerald-700",
 
-  warning: "bg-[#fff4df] text-[#e17b00]",
+  warning: "bg-amber-50 text-amber-700",
 
-  danger: "bg-[#ffe8e8] text-[#d92d20]",
+  danger: "bg-destructive/10 text-destructive",
 
-  info: "bg-[#e8f1ff] text-[#2563eb]",
+  info: "bg-accent text-primary",
 
-  neutral: "bg-[#f1f2f6] text-[#5d6280]",
+  neutral: "bg-muted text-muted-foreground",
 
-  purple: "bg-[#f0edff] text-[#6c3ce9]",
+  purple: "bg-accent text-primary",
 };
 
 export function StatusBadge({ children, variant = "neutral", className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "admin-status-badge inline-flex items-center rounded-md px-2 py-1 font-medium text-[11px]",
+        "admin-status-badge inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium text-xs whitespace-nowrap",
         variants[variant],
         className,
       )}
     >
+      <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-current" />
       {children}
     </span>
   );

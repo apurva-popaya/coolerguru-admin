@@ -67,7 +67,7 @@ export function AdminActivity() {
         title="Activity"
         description="View and monitor all platform activity in real time."
         action={
-          <Button variant="outline" className="gap-2 border-[#cfcdf5] text-[#2720a8]">
+          <Button variant="outline" className="gap-2 border-[#cfcdf5] text-primary">
             <Download className="size-4" />
             Export
           </Button>

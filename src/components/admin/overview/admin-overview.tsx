@@ -10,11 +10,11 @@ import {
   MessagesSquare,
   Package,
   Users,
-  X,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
+import { DateRangePicker } from "@/components/common/date-range-picker";
 import {
   getAdminDashboard,
   type AdminDashboardCompany,
@@ -134,45 +134,44 @@ function formatSelectedDate(date: string) {
   });
 }
 
-function getCurrentMonthRange() {
+function getRollingMonthRange() {
   const today = new Date();
-
-  const firstDay = new Date(
+  const lastDayOfPreviousMonth = new Date(
     today.getFullYear(),
     today.getMonth(),
-    1,
-  );
-
-  const lastDay = new Date(
-    today.getFullYear(),
-    today.getMonth() + 1,
     0,
+  );
+  // Clamp month-end dates when the previous month has fewer days.
+  const oneMonthAgo = new Date(
+    today.getFullYear(),
+    today.getMonth() - 1,
+    Math.min(today.getDate(), lastDayOfPreviousMonth.getDate()),
   );
 
   return {
-    from: toInputDate(firstDay),
-    to: toInputDate(lastDay),
+    from: toInputDate(oneMonthAgo),
+    to: toInputDate(today),
   };
 }
 
 export function AdminOverview() {
-  const currentMonth = getCurrentMonthRange();
+  const [defaultRange] = useState(getRollingMonthRange);
 
   /*
    * Applied date range.
    *
    * These are the dates actually sent to the API.
    */
-  const [dateFrom, setDateFrom] = useState(currentMonth.from);
-  const [dateTo, setDateTo] = useState(currentMonth.to);
+  const [dateFrom, setDateFrom] = useState(defaultRange.from);
+  const [dateTo, setDateTo] = useState(defaultRange.to);
 
   /*
    * Temporary date range used inside the date picker.
    *
    * This allows the admin to select both dates and then press Apply.
    */
-  const [draftDateFrom, setDraftDateFrom] = useState(currentMonth.from);
-  const [draftDateTo, setDraftDateTo] = useState(currentMonth.to);
+  const [draftDateFrom, setDraftDateFrom] = useState(defaultRange.from);
+  const [draftDateTo, setDraftDateTo] = useState(defaultRange.to);
 
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
@@ -303,10 +302,10 @@ export function AdminOverview() {
                 variant="outline"
                 onClick={handleOpenDatePicker}
                 aria-expanded={isDatePickerOpen}
-                className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-white px-4 font-semibold text-[#15136f] text-admin-14"
+                className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-card px-4 font-semibold text-foreground text-admin-14"
               >
                 <span className="flex items-center gap-2">
-                  <CalendarDays className="size-4 text-[#2720a8]" />
+                  <CalendarDays className="size-4 text-primary" />
 
                   {formatSelectedDate(dateFrom)} -{" "}
                   {formatSelectedDate(dateTo)}
@@ -314,7 +313,7 @@ export function AdminOverview() {
 
                 <ChevronDown
                   data-icon="inline-end"
-                  className={`shrink-0 text-[#5d6280] transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
+                  className={`shrink-0 text-muted-foreground transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
                 />
               </Button>
             </div>
@@ -325,7 +324,7 @@ export function AdminOverview() {
           {Array.from({ length: 6 }).map((_, index) => (
             <div
               key={index}
-              className="min-h-[140px] animate-pulse rounded-[8px] border border-[#e3e6f3] bg-white p-4"
+              className="min-h-[140px] animate-pulse rounded-2xl border border-border bg-card p-4"
             >
               <div className="flex items-start gap-3">
                 <div className="size-[50px] rounded-full bg-[#eef0f7]" />
@@ -343,16 +342,16 @@ export function AdminOverview() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-          <div className="h-[330px] animate-pulse rounded-[8px] border border-[#e3e6f3] bg-white" />
+          <div className="h-[330px] animate-pulse rounded-2xl border border-border bg-card" />
 
-          <div className="h-[330px] animate-pulse rounded-[8px] border border-[#e3e6f3] bg-white" />
+          <div className="h-[330px] animate-pulse rounded-2xl border border-border bg-card" />
         </div>
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
-              className="h-[300px] animate-pulse rounded-[8px] border border-[#e3e6f3] bg-white"
+              className="h-[300px] animate-pulse rounded-2xl border border-border bg-card"
             />
           ))}
         </div>
@@ -373,10 +372,10 @@ export function AdminOverview() {
                 variant="outline"
                 onClick={handleOpenDatePicker}
                 aria-expanded={isDatePickerOpen}
-                className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-white px-4 font-semibold text-[#15136f] text-admin-14"
+                className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-card px-4 font-semibold text-foreground text-admin-14"
               >
                 <span className="flex items-center gap-2">
-                  <CalendarDays className="size-4 text-[#2720a8]" />
+                  <CalendarDays className="size-4 text-primary" />
 
                   {formatSelectedDate(dateFrom)} -{" "}
                   {formatSelectedDate(dateTo)}
@@ -384,14 +383,14 @@ export function AdminOverview() {
 
                 <ChevronDown
                   data-icon="inline-end"
-                  className={`shrink-0 text-[#5d6280] transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
+                  className={`shrink-0 text-muted-foreground transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
                 />
               </Button>
             </div>
           }
         />
 
-        <div className="rounded-[8px] border border-red-200 bg-red-50 p-5">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
           <p className="font-semibold text-red-600 text-admin-15">
             Unable to load dashboard
           </p>
@@ -403,7 +402,7 @@ export function AdminOverview() {
           <Button
             type="button"
             onClick={() => void loadDashboard(dateFrom, dateTo)}
-            className="mt-4 bg-[#2720a8] text-white"
+            className="mt-4 bg-primary text-primary-foreground"
           >
             Try Again
           </Button>
@@ -435,10 +434,10 @@ export function AdminOverview() {
               variant="outline"
               onClick={handleOpenDatePicker}
               aria-expanded={isDatePickerOpen}
-              className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-white px-4 font-semibold text-[#15136f] text-admin-14"
+              className="h-[42px] min-w-[255px] justify-between border-[#dcddef] bg-card px-4 font-semibold text-foreground text-admin-14"
             >
               <span className="flex items-center gap-2">
-                <CalendarDays className="size-4 text-[#2720a8]" />
+                <CalendarDays className="size-4 text-primary" />
 
                 {formatSelectedDate(dateFrom)} -{" "}
                 {formatSelectedDate(dateTo)}
@@ -446,7 +445,7 @@ export function AdminOverview() {
 
               <ChevronDown
                 data-icon="inline-end"
-                className={`shrink-0 text-[#5d6280] transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
+                className={`shrink-0 text-muted-foreground transition-transform ${isDatePickerOpen ? "rotate-180" : ""}`}
               />
             </Button>
 
@@ -469,14 +468,12 @@ export function AdminOverview() {
           title="Total Companies"
           value={summary.total_companies}
           icon={Building2}
-          iconVariant="blue"
         />
 
         <OverviewStatCard
           title="Pending Company Approvals"
           value={summary.pending_company_approvals}
           icon={Clock3}
-          iconVariant="orange"
           subtitle="Awaiting review"
         />
 
@@ -484,14 +481,12 @@ export function AdminOverview() {
           title="Total Products"
           value={summary.total_products}
           icon={Package}
-          iconVariant="purple"
         />
 
         <OverviewStatCard
           title="Pending Product Approvals"
           value={summary.pending_product_approvals}
           icon={Clock3}
-          iconVariant="orange"
           subtitle="Awaiting review"
         />
 
@@ -499,14 +494,12 @@ export function AdminOverview() {
           title="Total Users"
           value={summary.total_users}
           icon={Users}
-          iconVariant="blue"
         />
 
         <OverviewStatCard
           title="Total Inquiries"
           value={summary.total_inquiries}
           icon={MessagesSquare}
-          iconVariant="green"
         />
       </div>
 
@@ -519,8 +512,9 @@ export function AdminOverview() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 min-[2600px]:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <OverviewMiniTable
+          className="xl:col-span-2"
           title="Recent Company Registrations"
           viewAllHref="/companies"
           emptyMessage="No recent company registrations found."
@@ -528,7 +522,7 @@ export function AdminOverview() {
             {
               key: "company",
               label: "Company Name",
-              className: "font-medium text-[#15136f]",
+              className: "font-medium text-foreground",
             },
             {
               key: "location",
@@ -554,7 +548,7 @@ export function AdminOverview() {
             {
               key: "product",
               label: "Product Name",
-              className: "font-medium text-[#15136f]",
+              className: "font-medium text-foreground",
             },
             {
               key: "company",
@@ -580,7 +574,7 @@ export function AdminOverview() {
             {
               key: "inquiry",
               label: "Inquiry ID",
-              className: "font-medium text-[#15136f]",
+              className: "font-medium text-foreground",
             },
             {
               key: "buyer",
@@ -602,110 +596,3 @@ export function AdminOverview() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/* Date Range Picker                                                           */
-/* -------------------------------------------------------------------------- */
-
-interface DateRangePickerProps {
-  draftDateFrom: string;
-  draftDateTo: string;
-  setDraftDateFrom: (value: string) => void;
-  setDraftDateTo: (value: string) => void;
-  onApply: () => void;
-  onCancel: () => void;
-}
-
-function DateRangePicker({
-  draftDateFrom,
-  draftDateTo,
-  setDraftDateFrom,
-  setDraftDateTo,
-  onApply,
-  onCancel,
-}: DateRangePickerProps) {
-  return (
-    <div
-      data-admin-date-picker
-      className="absolute right-0 top-[48px] z-50 w-[min(320px,calc(100vw-2rem))] rounded-[10px] border border-[#e0e2ed] bg-white p-5 shadow-xl"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 className="font-bold text-[#171570] text-admin-15">
-            Select Date Range
-          </h3>
-
-          <p className="mt-1 text-[#85899f] text-admin-14">
-            Choose the period for dashboard data.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex size-8 items-center justify-center rounded-full text-[#777b94] transition hover:bg-[#f3f3f8] hover:text-[#171570]"
-          aria-label="Close date picker"
-        >
-          <X size={17} />
-        </button>
-      </div>
-
-      <div className="mt-5 space-y-4">
-        <div>
-          <label
-            htmlFor="admin-date-from"
-            className="mb-1.5 block font-semibold text-[#454a68] text-admin-14"
-          >
-            From Date
-          </label>
-
-          <input
-            id="admin-date-from"
-            type="date"
-            value={draftDateFrom}
-            max={draftDateTo || undefined}
-            onChange={(event) => setDraftDateFrom(event.target.value)}
-            className="h-[42px] w-full rounded-[6px] border border-[#dcddef] bg-white px-3 text-[#313656] text-admin-14 outline-none transition focus:border-[#2720a8] focus:ring-2 focus:ring-[#2720a8]/10"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="admin-date-to"
-            className="mb-1.5 block font-semibold text-[#454a68] text-admin-14"
-          >
-            To Date
-          </label>
-
-          <input
-            id="admin-date-to"
-            type="date"
-            value={draftDateTo}
-            min={draftDateFrom || undefined}
-            onChange={(event) => setDraftDateTo(event.target.value)}
-            className="h-[42px] w-full rounded-[6px] border border-[#dcddef] bg-white px-3 text-[#313656] text-admin-14 outline-none transition focus:border-[#2720a8] focus:ring-2 focus:ring-[#2720a8]/10"
-          />
-        </div>
-      </div>
-
-      <div className="mt-5 flex gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          className="h-[40px] flex-1 border-[#dcddef] bg-white font-semibold text-[#555b76] text-admin-14"
-        >
-          Cancel
-        </Button>
-
-        <Button
-          type="button"
-          onClick={onApply}
-          disabled={!draftDateFrom || !draftDateTo}
-          className="h-[40px] flex-1 bg-[#2720a8] font-semibold text-admin-14 text-white hover:bg-[#1e188d]"
-        >
-          Apply
-        </Button>
-      </div>
-    </div>
-  );
-}

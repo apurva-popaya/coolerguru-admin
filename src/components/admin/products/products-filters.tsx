@@ -37,14 +37,14 @@ export function ProductsFilters({ values, onChange, onReset }: ProductsFiltersPr
   }
 
   const selectors: { key: Exclude<keyof ProductsFilterValues, "search">; label: string; options: ProductFilterOption[] }[] = [
-    { key: "status", label: "Listing status", options: choices([["ALL", "All listing status"], ["ACTIVE", "Active"], ["INACTIVE", "Inactive"]]) },
+    { key: "status", label: "Listing status", options: choices([["ALL", "All listing status"], ["ACTIVE", "Active"], ["INACTIVE", "Inactive"], ["DELETED", "Deleted"]]) },
     { key: "approvalStatus", label: "Approval status", options: choices([["ALL", "All approvals"], ["PENDING", "Pending"], ["UNDER_REVIEW", "Under Review"], ["APPROVED", "Approved"], ["REJECTED", "Rejected"]]) },
   ];
   const active = selectors.filter((selector) => values[selector.key] !== "ALL");
 
   function updateSelect(key: Exclude<keyof ProductsFilterValues, "search">, value: string) {
     if (key === "status") {
-      if (value === "ALL" || value === "ACTIVE" || value === "INACTIVE") updateValue(key, value);
+      if (value === "ALL" || value === "ACTIVE" || value === "INACTIVE" || value === "DELETED") updateValue(key, value);
     } else if (key === "stockStatus") {
       if (value === "ALL" || value === "IN_STOCK" || value === "LOW_STOCK" || value === "OUT_OF_STOCK") updateValue(key, value);
     } else if (key === "approvalStatus") {

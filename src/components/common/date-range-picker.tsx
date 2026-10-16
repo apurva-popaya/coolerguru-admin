@@ -14,6 +14,15 @@ interface DateRangePickerProps {
   onCancel: () => void;
 }
 
+function openDateCalendar(input: HTMLInputElement) {
+  try {
+    input.showPicker?.();
+  } catch {
+    // Keep native input interaction available when the browser blocks showPicker.
+    input.focus();
+  }
+}
+
 export function DateRangePicker({
   draftDateFrom,
   draftDateTo,
@@ -22,7 +31,10 @@ export function DateRangePicker({
   onApply,
   onCancel,
 }: DateRangePickerProps) {
-  const invalidRange = Boolean(draftDateFrom && draftDateTo && draftDateFrom > draftDateTo);
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const hasFutureDate = draftDateFrom > today || draftDateTo > today;
+  const invalidRange = hasFutureDate || Boolean(draftDateFrom && draftDateTo && draftDateFrom > draftDateTo);
 
   return (
     <div
@@ -75,7 +87,8 @@ export function DateRangePicker({
             aria-invalid={invalidRange || undefined}
             aria-describedby={invalidRange ? "admin-date-range-error" : undefined}
             value={draftDateFrom}
-            max={draftDateTo || undefined}
+            max={draftDateTo && draftDateTo < today ? draftDateTo : today}
+            onClick={(event) => openDateCalendar(event.currentTarget)}
             onChange={(event) => setDraftDateFrom(event.target.value)}
             className="h-11 rounded-xl px-3"
           />
@@ -91,12 +104,16 @@ export function DateRangePicker({
             aria-describedby={invalidRange ? "admin-date-range-error" : undefined}
             value={draftDateTo}
             min={draftDateFrom || undefined}
+            max={today}
+            onClick={(event) => openDateCalendar(event.currentTarget)}
             onChange={(event) => setDraftDateTo(event.target.value)}
             className="h-11 rounded-xl px-3"
           />
         </Field>
         {invalidRange && (
-          <FieldError id="admin-date-range-error">The start date must be on or before the end date.</FieldError>
+          <FieldError id="admin-date-range-error">
+            {hasFutureDate ? "Future dates cannot be selected." : "The start date must be on or before the end date."}
+          </FieldError>
         )}
       </FieldGroup>
 

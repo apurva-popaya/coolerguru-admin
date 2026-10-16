@@ -15,7 +15,7 @@ import { Download, Loader2 } from "lucide-react";
 import { DataTable } from "@/components/common/data-table/data-table";
 import { PageHeader } from "@/components/common/page-header";
 import { Button } from "@/components/ui/button";
-import { type AdminProductListItem, type AdminProductsSummary, exportAdminProducts, getAdminProducts } from "@/lib/api/admin-products-api";
+import { type AdminProductsSummary, exportAdminProducts, getAdminProducts } from "@/lib/api/admin-products-api";
 import { dataTableFeatures } from "@/lib/data-table-features";
 
 import { createProductsColumns } from "./products-columns";
@@ -58,7 +58,7 @@ export function AdminProducts() {
 
   const [filters, setFilters] = React.useState<ProductsFilterValues>(initialFilters);
 
-  const [appliedSearch, setAppliedSearch] = React.useState("");
+  const [appliedSearch, setAppliedSearch] = React.useState(() => searchParams.get("search")?.trim() ?? "");
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -78,10 +78,8 @@ export function AdminProducts() {
   const [exporting, setExporting] = React.useState(false);
 
   const [exportError, setExportError] = React.useState("");
-  const productSnapshot = React.useRef<Promise<AdminProductListItem[]> | null>(null);
   const [reloadVersion, setReloadVersion] = React.useState(0);
   const onStatusUpdated = React.useCallback(() => {
-    productSnapshot.current = null;
     setPagination((previous) => ({ ...previous, pageIndex: 0 }));
     setRowSelection({});
     setReloadVersion((previous) => previous + 1);
@@ -112,54 +110,22 @@ export function AdminProducts() {
       setError("");
 
       try {
-        // Load all pages once so live search and dropdowns cover the complete product list.
-        if (!productSnapshot.current) {
-          productSnapshot.current = (async () => {
-            const first = await getAdminProducts({ page: 1, limit: 100 });
-            if (!first.success || !first.data) throw new Error("Unable to load products. Please try again.");
-            const items = [...first.data.products];
-            for (let page = 2; page <= first.data.pagination.totalPages; page++) {
-              const response = await getAdminProducts({ page, limit: first.data.pagination.limit });
-              if (!response.success || !response.data) throw new Error("Unable to load products. Please try again.");
-              items.push(...response.data.products);
-            }
-            return items;
-          })().catch((error) => {
-            productSnapshot.current = null;
-            throw error;
-          });
-        }
-        const allProducts = await productSnapshot.current;
-        if (!active) {
-          return;
-        }
-        const search = appliedSearch.toLowerCase();
-        const matchingProducts = allProducts.filter((product) => {
-          if (search && !`${product.name} ${product.product_id} ${product.model_number ?? ""} ${product.sku ?? ""} ${product.company?.name ?? ""} ${product.category.name}`.toLowerCase().includes(search)) return false;
-          if (filters.companyId !== "ALL" && String(product.company?.company_id) !== filters.companyId) return false;
-          if (filters.categoryId !== "ALL" && String(product.category.category_id) !== filters.categoryId) return false;
-          if (filters.status !== "ALL" && product.is_active !== (filters.status === "ACTIVE")) return false;
-          if (filters.stockStatus !== "ALL" && product.availability_status !== filters.stockStatus) return false;
-          if (filters.approvalStatus !== "ALL" && product.approval_status !== filters.approvalStatus) return false;
-          return true;
+        const response = await getAdminProducts({
+          page: pagination.pageIndex + 1,
+          limit: pagination.pageSize,
+          search: appliedSearch || undefined,
+          company_id: filters.companyId === "ALL" ? undefined : Number(filters.companyId),
+          category_id: filters.categoryId === "ALL" ? undefined : Number(filters.categoryId),
+          status: filters.status,
+          stock_status: filters.stockStatus,
+          approval_status: filters.approvalStatus,
         });
-        const pageStart = pagination.pageIndex * pagination.pageSize;
-        const rows = matchingProducts.slice(pageStart, pageStart + pagination.pageSize).map(mapAdminProductToRow);
-
-        setProducts(rows);
-
-        setSummary({
-          total: matchingProducts.length,
-          active: matchingProducts.filter((product) => product.is_active).length,
-          inactive: matchingProducts.filter((product) => !product.is_active).length,
-          approved: matchingProducts.filter((product) => product.approval_status === "APPROVED").length,
-          pending_approval: matchingProducts.filter((product) => product.approval_status === "PENDING").length,
-          out_of_stock: matchingProducts.filter((product) => product.availability_status === "OUT_OF_STOCK").length,
-        });
-
-        setTotalItems(matchingProducts.length);
-
-        setTotalPages(Math.max(Math.ceil(matchingProducts.length / pagination.pageSize), 1));
+        if (!active) return;
+        if (!response.success || !response.data) throw new Error("Unable to load products. Please try again.");
+        setProducts(response.data.products.map(mapAdminProductToRow));
+        setSummary(response.data.summary);
+        setTotalItems(response.data.pagination.totalItems);
+        setTotalPages(Math.max(response.data.pagination.totalPages, 1));
 
       } catch (error) {
         if (!active) {

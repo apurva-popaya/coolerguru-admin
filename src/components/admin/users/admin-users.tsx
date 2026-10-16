@@ -33,7 +33,6 @@ import {
   getAdminUsers,
   getAdminUsersSummary,
   type AdminUsersSummary,
-  type AdminUserListItem,
 } from "@/lib/api/admin-users-api";
 
 import {
@@ -122,7 +121,7 @@ export function AdminUsers() {
   const [
     appliedSearch,
     setAppliedSearch,
-  ] = React.useState("");
+  ] = React.useState(() => searchParams.get("search")?.trim() ?? "");
 
   const [
     sorting,
@@ -182,7 +181,6 @@ export function AdminUsers() {
   );
 }, [searchParams]);
 
-  const userSnapshot = React.useRef<Promise<AdminUserListItem[]> | null>(null);
   const loadSequence = React.useRef(0);
 
   const loadUsers = React.useCallback(async () => {
@@ -190,43 +188,19 @@ export function AdminUsers() {
     setLoading(true);
     setError("");
     try {
-      if (!userSnapshot.current) {
-        userSnapshot.current = (async () => {
-          const first = await getAdminUsers({ page: 1, limit: 100 });
-          if (!first.data) throw new Error("Unable to load users. Please try again.");
-          const result = [...first.data.users];
-          for (let page = 2; page <= first.data.pagination.totalPages; page++) {
-            const response = await getAdminUsers({ page, limit: first.data.pagination.limit });
-            if (!response.data) throw new Error("Unable to load users. Please try again.");
-            result.push(...response.data.users);
-          }
-          return result;
-        })();
-      }
-      const snapshot = userSnapshot.current;
-      let allUsers: AdminUserListItem[];
-      try {
-        allUsers = await snapshot;
-      } catch (error) {
-        if (userSnapshot.current === snapshot) userSnapshot.current = null;
-        throw error;
-      }
-      if (sequence !== loadSequence.current) return;
-      const search = appliedSearch.toLowerCase();
-      const matchingUsers = allUsers.filter((user) => {
-        if (filters.role !== "ALL" && !user.roles.includes(filters.role)) return false;
-        if (filters.accountType !== "ALL" && user.account_type !== filters.accountType) return false;
-        if (filters.status !== "ALL" && user.status !== filters.status) return false;
-        return !search || [user.name, user.email, user.phone_number, user.company?.name, user.user_id]
-          .join(" ").toLowerCase().includes(search);
+      const response = await getAdminUsers({
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        search: appliedSearch || undefined,
+        role: filters.role === "ALL" ? undefined : filters.role,
+        account_type: filters.accountType === "ALL" ? undefined : filters.accountType,
+        status: filters.status === "ALL" ? undefined : filters.status,
       });
-      const pages = Math.max(Math.ceil(matchingUsers.length / pagination.pageSize), 1);
-      const pageIndex = Math.min(pagination.pageIndex, pages - 1);
-      setUsers(matchingUsers.slice(pageIndex * pagination.pageSize, (pageIndex + 1) * pagination.pageSize)
-        .map(mapAdminUserToRow));
-      setTotalItems(matchingUsers.length);
-      setTotalPages(pages);
-      if (pageIndex !== pagination.pageIndex) setPagination((previous) => ({ ...previous, pageIndex }));
+      if (sequence !== loadSequence.current) return;
+      if (!response.data) throw new Error("Unable to load users. Please try again.");
+      setUsers(response.data.users.map(mapAdminUserToRow));
+      setTotalItems(response.data.pagination.totalItems);
+      setTotalPages(Math.max(response.data.pagination.totalPages, 1));
     } catch {
       if (sequence !== loadSequence.current) return;
       setUsers([]);
@@ -274,7 +248,6 @@ export function AdminUsers() {
   const handleStatusUpdated =
   React.useCallback(
     () => {
-      userSnapshot.current = null;
       void loadUsers();
       void loadSummary();
     },

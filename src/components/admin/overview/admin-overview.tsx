@@ -82,7 +82,7 @@ function mapCompanies(companies: AdminDashboardCompany[]) {
 function mapProducts(products: AdminDashboardProduct[]) {
   return products.map((product) => ({
     product: product.name,
-    company: product.company.name,
+    company: product.company?.name ?? "Unavailable",
     date: formatDate(product.created_at),
     status: formatStatus(product.approval_status),
   }));
@@ -92,7 +92,7 @@ function mapInquiries(inquiries: AdminDashboardInquiry[]) {
   return inquiries.map((inquiry) => ({
     inquiry: inquiry.inquiry_number,
     buyer: inquiry.buyer_name,
-    company: inquiry.company.name,
+    company: inquiry.company?.name ?? "Unavailable",
     date: formatDate(inquiry.created_at),
     status: formatStatus(inquiry.status),
   }));
@@ -238,7 +238,7 @@ export function AdminOverview() {
   const handleOpenDatePicker = () => {
     setDraftDateFrom(dateFrom);
     setDraftDateTo(dateTo);
-    setIsDatePickerOpen(true);
+    setIsDatePickerOpen((previous) => !previous);
   };
 
   const handleCancelDatePicker = () => {
@@ -249,6 +249,11 @@ export function AdminOverview() {
 
   const handleApplyDateRange = () => {
     if (!draftDateFrom || !draftDateTo) {
+      return;
+    }
+
+    const today = toInputDate(new Date());
+    if (draftDateFrom > today || draftDateTo > today) {
       return;
     }
 

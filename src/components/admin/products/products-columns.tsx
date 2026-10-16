@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, Loader2, MoreHorizontal, Package, Pencil, Power, PowerOff } from "lucide-react";
+import { Eye, Loader2, MoreHorizontal, Package, Pencil, Power, PowerOff, RotateCcw } from "lucide-react";
 
 import { StatusBadge, type StatusVariant } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { updateProductActiveStatus } from "@/lib/api/admin-products-api";
+import { restoreAdminProduct, updateProductActiveStatus } from "@/lib/api/admin-products-api";
 import type { DataTableFeatures } from "@/lib/data-table-features";
 
 import type { ProductRow } from "./products-data";
@@ -55,20 +55,26 @@ function ProductActions({ product, onStatusUpdated }: { product: ProductRow; onS
   const [saving, setSaving] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const active = product.listingStatus === "Active";
-  const canToggle = Boolean(product.slug) && product.approvalStatus === "Approved";
-  const action = active ? "Deactivate product" : "Activate product";
+  const deleted = product.listingStatus === "Deleted";
+  const canToggle = Boolean(product.slug) && (deleted || product.approvalStatus === "Approved");
+  const actionVerb = deleted ? "Restore" : active ? "Deactivate" : "Activate";
+  const action = `${actionVerb} product`;
 
   async function toggleStatus() {
     if (saving || !canToggle) return;
     setSaving(true);
     try {
-      const response = await updateProductActiveStatus(product.slug, !active);
+      const response = deleted
+        ? await restoreAdminProduct(product.slug)
+        : await updateProductActiveStatus(product.slug, !active);
       if (!response.success) throw new Error("Status update failed.");
-      toast.success(active ? "Product deactivated." : "Product activated.");
+      toast.success(deleted ? "Product restored." : active ? "Product deactivated." : "Product activated.");
       setConfirmOpen(false);
       onStatusUpdated();
     } catch {
-      toast.error("We couldn't update the product status. Please try again.");
+      toast.error(deleted
+        ? "We couldn't restore the product. Please try again."
+        : "We couldn't update the product status. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -88,16 +94,17 @@ function ProductActions({ product, onStatusUpdated }: { product: ProductRow; onS
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem disabled={!canToggle || saving} variant={active ? "destructive" : "default"} onSelect={() => setConfirmOpen(true)}>{active ? <PowerOff /> : <Power />}{action}</DropdownMenuItem>
+          <DropdownMenuItem disabled={!canToggle || saving} variant={active ? "destructive" : "default"} onSelect={() => setConfirmOpen(true)}>{deleted ? <RotateCcw /> : active ? <PowerOff /> : <Power />}{action}</DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
     <AlertDialog open={confirmOpen} onOpenChange={(open) => { if (!saving) setConfirmOpen(open); }}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{active ? "Deactivate product?" : "Activate product?"}</AlertDialogTitle>
+          <AlertDialogTitle>{actionVerb} product?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to {active ? "deactivate" : "activate"} “{product.name}”?
+            Are you sure you want to {actionVerb.toLowerCase()} “{product.name}”?
+            {deleted && " It will become visible to the seller again with its previous listing and approval status."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -107,7 +114,7 @@ function ProductActions({ product, onStatusUpdated }: { product: ProductRow; onS
             void toggleStatus();
           }}>
             {saving && <Loader2 data-icon="inline-start" className="animate-spin" />}
-            {saving ? "Updating..." : active ? "Deactivate" : "Activate"}
+            {saving ? (deleted ? "Restoring..." : "Updating...") : actionVerb}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

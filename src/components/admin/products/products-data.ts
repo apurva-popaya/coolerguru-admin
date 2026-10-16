@@ -1,10 +1,10 @@
 import type { AdminProductListItem } from "@/lib/api/admin-products-api";
 
-export type ProductListingStatus = "Active" | "Inactive";
+export type ProductListingStatus = "Active" | "Inactive" | "Deleted";
 
 export type ProductStockStatus = "In Stock" | "Low Stock" | "Out of Stock";
 
-export type ProductApprovalStatus = "Pending" | "Under Review" | "Approved" | "Rejected";
+export type ProductApprovalStatus = "Pending" | "Under Review" | "Approved" | "Rejected" | "N/A";
 
 export interface ProductRow {
   id: string;
@@ -52,6 +52,9 @@ function mapStockStatus(status: AdminProductListItem["availability_status"]): Pr
 
 function mapApprovalStatus(status: AdminProductListItem["approval_status"]): ProductApprovalStatus {
   switch (status) {
+    case null:
+    case "N/A":
+      return "N/A";
     case "PENDING":
       return "Pending";
 
@@ -67,6 +70,7 @@ function mapApprovalStatus(status: AdminProductListItem["approval_status"]): Pro
 }
 
 export function mapAdminProductToRow(product: AdminProductListItem): ProductRow {
+  const deleted = product.status === "DELETED" || Boolean(product.deleted_at);
   return {
     id: String(product.product_id),
 
@@ -86,11 +90,11 @@ export function mapAdminProductToRow(product: AdminProductListItem): ProductRow 
 
     price: product.price !== null ? Number(product.price) : null,
 
-    listingStatus: product.is_active ? "Active" : "Inactive",
+    listingStatus: deleted ? "Deleted" : product.is_active ? "Active" : "Inactive",
 
     stockStatus: mapStockStatus(product.availability_status),
 
-    approvalStatus: mapApprovalStatus(product.approval_status),
+    approvalStatus: deleted ? "N/A" : mapApprovalStatus(product.approval_status),
 
     views: 0,
 

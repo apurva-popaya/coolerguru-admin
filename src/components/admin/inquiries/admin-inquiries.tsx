@@ -32,7 +32,6 @@ import {
   getAdminInquiries,
   getAdminInquirySummary,
   type AdminInquirySummary,
-  type AdminInquiryListItem,
 } from "@/lib/api/admin-inquiries-api";
 
 import {
@@ -74,7 +73,6 @@ const emptySummary: AdminInquirySummary = {
 };
 
 export function AdminInquiries() {
-  const inquirySnapshot = React.useRef<Promise<AdminInquiryListItem[]> | null>(null);
   const [
     inquiries,
     setInquiries,
@@ -211,43 +209,19 @@ export function AdminInquiries() {
       setError("");
 
       try {
-        if (!inquirySnapshot.current) {
-          inquirySnapshot.current = (async () => {
-            const first = await getAdminInquiries({ page: 1, limit: 100 });
-            if (!first.success || !first.data) throw new Error("Unable to load inquiries. Please try again.");
-            const items = [...first.data.inquiries];
-            for (let page = 2; page <= first.data.pagination.totalPages; page++) {
-              const response = await getAdminInquiries({ page, limit: first.data.pagination.limit });
-              if (!response.success || !response.data) throw new Error("Unable to load inquiries. Please try again.");
-              items.push(...response.data.inquiries);
-            }
-            return items;
-          })().catch((error) => {
-            inquirySnapshot.current = null;
-            throw error;
-          });
-        }
-        const allInquiries = await inquirySnapshot.current;
-        if (!active) return;
-        const search = appliedSearch.toLowerCase();
-        const matches = allInquiries.filter((inquiry) => {
-          if (filters.inquiryType !== "ALL" && inquiry.inquiry_type !== filters.inquiryType) return false;
-          if (filters.dateFrom || filters.dateTo) {
-            const date = new Date(inquiry.created_at);
-            if (Number.isNaN(date.getTime())) return false;
-            const parts = new Intl.DateTimeFormat("en-CA", {
-              timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit",
-            }).formatToParts(date);
-            const dateKey = ["year", "month", "day"].map((type) => parts.find((part) => part.type === type)?.value).join("-");
-            if (filters.dateFrom && dateKey < filters.dateFrom) return false;
-            if (filters.dateTo && dateKey > filters.dateTo) return false;
-          }
-          return !search || `${inquiry.inquiry_number} ${inquiry.inquiry_id} ${inquiry.buyer_name} ${inquiry.buyer?.name ?? ""} ${inquiry.company?.name ?? ""} ${inquiry.product?.name ?? ""} ${inquiry.product_requirement}`.toLowerCase().includes(search);
+        const response = await getAdminInquiries({
+          page: pagination.pageIndex + 1,
+          limit: pagination.pageSize,
+          search: appliedSearch || undefined,
+          inquiry_type: filters.inquiryType === "ALL" ? undefined : filters.inquiryType,
+          date_from: filters.dateFrom || undefined,
+          date_to: filters.dateTo || undefined,
         });
-        const start = pagination.pageIndex * pagination.pageSize;
-        setInquiries(matches.slice(start, start + pagination.pageSize).map(mapAdminInquiryToRow));
-        setTotalItems(matches.length);
-        setTotalPages(Math.max(Math.ceil(matches.length / pagination.pageSize), 1));
+        if (!active) return;
+        if (!response.success || !response.data) throw new Error("Unable to load inquiries. Please try again.");
+        setInquiries(response.data.inquiries.map(mapAdminInquiryToRow));
+        setTotalItems(response.data.pagination.totalItems);
+        setTotalPages(Math.max(response.data.pagination.totalPages, 1));
 
       } catch (error) {
         if (!active) {

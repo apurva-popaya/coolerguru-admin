@@ -396,6 +396,8 @@ export type AdminCompaniesResponse =
 
 export interface GetAdminCompaniesParams {
   search?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  featured?: "FEATURED" | "UNFEATURED";
   verification_status?:
     | "DRAFT"
     | "PENDING"
@@ -411,6 +413,9 @@ export async function getAdminCompanies(
   params: GetAdminCompaniesParams = {},
 ) {
   const searchParams = new URLSearchParams();
+
+  if (params.status) searchParams.set("status", params.status);
+  if (params.featured) searchParams.set("featured", params.featured);
 
   if (params.search?.trim()) {
     searchParams.set(

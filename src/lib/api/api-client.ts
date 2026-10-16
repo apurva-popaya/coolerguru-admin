@@ -102,7 +102,34 @@ export async function runRefresh(portal?: ActivePortal): Promise<boolean> {
   return refreshPromise;
 }
 
+const pendingAdminReads = new Map<string, Promise<unknown>>();
+
 export async function apiRequest<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<T> {
+  const method = (options.method ?? "GET").toUpperCase();
+  const isBrowserAdminRequest = typeof window !== "undefined" && endpoint.startsWith("/admin/");
+
+  if (!isBrowserAdminRequest || method !== "GET" || options.signal || options.body) {
+    if (isBrowserAdminRequest && method !== "GET") pendingAdminReads.clear();
+    return performApiRequest<T>(endpoint, options);
+  }
+
+  // Share only pending browser reads. Completed responses are never cached, and
+  // auth requests, mutations, and independently cancellable requests stay separate.
+  const key = JSON.stringify([
+    endpoint,
+    { ...options, method, portal: "ADMIN", headers: Array.from(new Headers(options.headers).entries()) },
+  ]);
+  const pending = pendingAdminReads.get(key);
+  if (pending) return pending as Promise<T>;
+
+  const request = performApiRequest<T>(endpoint, options).finally(() => {
+    if (pendingAdminReads.get(key) === request) pendingAdminReads.delete(key);
+  });
+  pendingAdminReads.set(key, request);
+  return request;
+}
+
+async function performApiRequest<T>(endpoint: string, options: ApiRequestOptions): Promise<T> {
   const { skipAuthRefresh = false, portal: portalOption, ...requestOptions } = options;
 
   const portal = resolvePortal(portalOption);

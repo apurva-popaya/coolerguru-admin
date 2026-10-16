@@ -4,7 +4,7 @@ import { AUTH_PORTAL_HEADER } from "@/lib/auth/auth-portal";
 import { csvToExcelBlob, getFilenameFromDisposition } from "@/lib/csv-to-excel";
 
 
-export type AdminProductStatus = "ALL" | "ACTIVE" | "INACTIVE";
+export type AdminProductStatus = "ALL" | "ACTIVE" | "INACTIVE" | "DELETED";
 
 export type AdminProductStockStatus = "ALL" | "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 
@@ -36,8 +36,10 @@ export interface AdminProductListItem {
   availability_status: "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 
   is_active: boolean;
+  status?: Exclude<AdminProductStatus, "ALL">;
+  deleted_at?: string | null;
 
-  approval_status: "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+  approval_status: "PENDING" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "N/A" | null;
 
   approval_note: string | null;
   created_at: string;
@@ -328,6 +330,12 @@ export async function updateProductActiveStatus(
     },
   );
 }
+export async function restoreAdminProduct(slug: string) {
+  return apiRequest<ApiResponse<unknown>>(`/admin/products/${encodeURIComponent(slug)}/restore`, {
+    method: "PATCH",
+  });
+}
+
 export type ExportAdminProductsQuery = Omit<AdminProductsQuery, "page" | "limit">;
 
 export interface AdminProductsExportFile {

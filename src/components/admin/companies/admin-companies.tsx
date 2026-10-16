@@ -19,9 +19,8 @@ import { dataTableFeatures } from "@/lib/data-table-features";
 import {
   exportAdminCompanies,
   getAdminCompanies,
-  type AdminCompaniesResponse,
-  type AdminCompanyDetail,
   type AdminCompanyExportVerificationStatus,
+  type GetAdminCompaniesParams,
 } from "@/lib/api/admin-companies-api";
 
 import {
@@ -73,10 +72,14 @@ export function AdminCompanies() {
   const globalSearch =
     searchParams.get("search")?.trim() ?? "";
 
-  setColumnFilters((previous) => [
-    ...previous.filter((filter) => filter.id !== "search"),
-    ...(globalSearch ? [{ id: "search", value: globalSearch }] : []),
-  ]);
+  setColumnFilters((previous) => {
+    const currentSearch = String(previous.find((filter) => filter.id === "search")?.value ?? "");
+    if (currentSearch === globalSearch) return previous;
+    return [
+      ...previous.filter((filter) => filter.id !== "search"),
+      ...(globalSearch ? [{ id: "search", value: globalSearch }] : []),
+    ];
+  });
 
   setPagination((previous) => ({
     ...previous,
@@ -91,7 +94,10 @@ export function AdminCompanies() {
   React.useState(false);
 
   const [columnFilters, setColumnFilters] =
-    React.useState<ColumnFiltersState>([]);
+    React.useState<ColumnFiltersState>(() => {
+      const search = searchParams.get("search")?.trim();
+      return search ? [{ id: "search", value: search }] : [];
+    });
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({
@@ -108,10 +114,6 @@ export function AdminCompanies() {
     React.useState({});
 
   const loadSequence = React.useRef(0);
-  const companySnapshot = React.useRef<Promise<{
-    response: AdminCompaniesResponse;
-    apiCompanies: AdminCompanyDetail[];
-  }> | null>(null);
 
   const loadCompanies =
     React.useCallback(
@@ -121,75 +123,26 @@ export function AdminCompanies() {
           setLoading(true);
           setError(null);
 
-          const requestParams = {
-    page:
-      1,
-
-    limit:
-      pagination.pageSize,
-  };
-
-          // Reuse loaded companies while typing instead of requesting every page per keystroke.
-          if (!companySnapshot.current) {
-            companySnapshot.current = (async () => {
-              const response = await getAdminCompanies(requestParams);
-              const companyPages = [response.data?.companies ?? []];
-              const totalPages = response.data?.pagination.totalPages ?? 1;
-              for (let page = 2; page <= totalPages; page++) {
-                const pageResponse = await getAdminCompanies({ ...requestParams, page });
-                companyPages.push(pageResponse.data?.companies ?? []);
-              }
-              return { response, apiCompanies: companyPages.flat() };
-            })().catch((error) => {
-              companySnapshot.current = null;
-              throw error;
-            });
-          }
-          const { response, apiCompanies } = await companySnapshot.current;
-          if (sequence !== loadSequence.current) return;
-          apiCompanies.sort((a, b) => {
-            if (a.is_featured !== b.is_featured) return a.is_featured ? -1 : 1;
-            if (!a.is_featured) return 0;
-            return (a.featured_priority ?? Number.MAX_SAFE_INTEGER) -
-              (b.featured_priority ?? Number.MAX_SAFE_INTEGER);
+          const filterValue = (id: string) =>
+            String(columnFilters.find((filter) => filter.id === id)?.value ?? "").trim();
+          const verification = filterValue("verificationStatus");
+          const status = filterValue("status");
+          const featured = filterValue("featured");
+          const response = await getAdminCompanies({
+            page: pagination.pageIndex + 1,
+            limit: pagination.pageSize,
+            search: filterValue("search") || undefined,
+            verification_status: verification
+              ? (verification.toUpperCase().replaceAll(" ", "_") as GetAdminCompaniesParams["verification_status"])
+              : undefined,
+            status: status ? (status === "Active" ? "ACTIVE" : "INACTIVE") : undefined,
+            featured: featured ? (featured === "Featured" ? "FEATURED" : "UNFEATURED") : undefined,
           });
-
-          const allRows = apiCompanies.map(mapAdminCompanyToRow);
-          const filteredRows = allRows.filter((company) => columnFilters.every(({ id, value }) => {
-            const filter = String(value).trim().toLowerCase();
-            if (!filter) return true;
-            if (id === "search") return `${company.name} ${company.companyId} ${company.location} ${company.businessType} ${company.businessTypes.join(" ")}`.toLowerCase().includes(filter);
-            if (id === "verificationStatus") return company.verificationStatus.toLowerCase() === filter;
-            if (id === "businessType") return [company.businessType, ...company.businessTypes].some((type) => type.toLowerCase() === filter);
-            if (id === "location") return company.location.toLowerCase() === filter;
-            if (id === "status") return company.isActive === (filter === "active");
-            if (id === "featured") return company.featured === (filter === "featured");
-            return true;
-          }));
-          const pageStart = pagination.pageIndex * pagination.pageSize;
-
-          const mappedCompanies =
-            filteredRows.slice(pageStart, pageStart + pagination.pageSize);
-
-          setCompanies(
-            mappedCompanies,
-          );
-
-          if (
-            response.data?.pagination
-          ) {
-            setPaginationInfo(
-              { ...response.data.pagination, totalItems: filteredRows.length, totalPages: Math.ceil(filteredRows.length / pagination.pageSize) },
-            );
-
-            setTotalItems(
-              filteredRows.length,
-            );
-          } else {
-            setTotalItems(
-              mappedCompanies.length,
-            );
-          }
+          if (sequence !== loadSequence.current) return;
+          if (!response.data) throw new Error("Unable to fetch companies.");
+          setCompanies(response.data.companies.map(mapAdminCompanyToRow));
+          setPaginationInfo(response.data.pagination);
+          setTotalItems(response.data.pagination.totalItems);
         } catch (err) {
           if (sequence !== loadSequence.current) return;
           console.error(
@@ -302,7 +255,6 @@ export function AdminCompanies() {
   }, [loadCompanies]);
 
   const reloadCompanies = React.useCallback(async () => {
-    companySnapshot.current = null;
     await loadCompanies();
   }, [loadCompanies]);
   const featured = useCompanyFeatured(reloadCompanies, setError);

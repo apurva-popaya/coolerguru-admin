@@ -39,7 +39,7 @@ export interface AdminDashboardProduct {
     company_id: number;
     name: string;
     slug: string;
-  };
+  } | null;
 }
 
 export interface AdminDashboardInquiry {
@@ -52,7 +52,7 @@ export interface AdminDashboardInquiry {
     company_id: number;
     name: string;
     slug: string;
-  };
+  } | null;
 }
 
 export interface PlatformGrowthPoint {

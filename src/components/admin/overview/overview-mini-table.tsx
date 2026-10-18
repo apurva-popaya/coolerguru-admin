@@ -74,14 +74,14 @@ export function OverviewMiniTable<T extends Record<string, string>>({
         </Link>
       </div>
 
-      <div className="min-w-0">
-        <table aria-label={title} className="block w-full table-fixed border-collapse sm:table">
+      <div className="min-w-0 overflow-x-auto" role="region" aria-label={title} tabIndex={0}>
+        <table aria-label={title} className="w-full min-w-[32rem] table-fixed border-collapse lg:min-w-0">
           <colgroup>
             {columns.map((column, index) => (
               <col key={String(column.key)} style={{ width: index === 0 ? "34%" : `${66 / (columns.length - 1)}%` }} />
             ))}
           </colgroup>
-          <thead className="hidden sm:table-header-group">
+          <thead>
             <tr className="bg-muted/60">
               {columns.map((column) => (
                 <th
@@ -97,16 +97,16 @@ export function OverviewMiniTable<T extends Record<string, string>>({
             </tr>
           </thead>
 
-          <tbody className="block sm:table-row-group">
+          <tbody>
             {data.length === 0 ? (
-              <tr className="block sm:table-row">
-                <td colSpan={columns.length} className="block px-3 py-10 text-center text-muted-foreground text-admin-14 sm:table-cell">
+              <tr>
+                <td colSpan={columns.length} className="px-3 py-10 text-center text-muted-foreground text-admin-14">
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="grid grid-cols-2 gap-y-3 border-b border-border py-4 transition-colors last:border-0 hover:bg-muted/40 sm:table-row sm:py-0">
+                <tr key={rowIndex} className="border-b border-border transition-colors last:border-0 hover:bg-muted/40">
                   {columns.map((column, columnIndex) => {
                     const value = row[column.key];
 
@@ -116,13 +116,10 @@ export function OverviewMiniTable<T extends Record<string, string>>({
                       <td
                         key={String(column.key)}
                         className={cn(
-                          "min-w-0 px-2.5 align-middle text-muted-foreground text-admin-13 sm:py-3.5",
+                          "min-w-0 px-2.5 align-middle text-muted-foreground text-admin-13 py-3.5",
                           column.className,
                         )}
                       >
-                        <span className="mb-1 block text-xs font-medium text-muted-foreground sm:hidden">
-                          {column.label}
-                        </span>
                         {isStatus ? (
                           <StatusBadge variant={getStatusVariant(value)} className="max-w-full whitespace-normal">
                             {value}

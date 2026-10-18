@@ -433,7 +433,7 @@ export function CompanyDetail({
           }
         >
           {company.products.length > 0 ? (
-            <div className="min-w-0" role="region" aria-label="Recent products table">
+            <div className="min-w-0 overflow-x-auto" tabIndex={0} role="region" aria-label="Recent products table">
               <table className="w-full table-fixed border-collapse">
                 <caption className="sr-only">Recent products for {company.name}</caption>
                 <colgroup><col className="w-[30%]" /><col className="w-1/4" /><col className="w-1/5" /><col className="w-1/4" /></colgroup>
@@ -509,7 +509,7 @@ export function CompanyDetail({
           }
         >
           {company.inquiries.length > 0 ? (
-            <div className="min-w-0" role="region" aria-label="Recent inquiries table">
+            <div className="min-w-0 overflow-x-auto" tabIndex={0} role="region" aria-label="Recent inquiries table">
               <table className="w-full table-fixed border-collapse">
                 <caption className="sr-only">Recent inquiries for {company.name}</caption>
                 <colgroup><col className="w-1/5" /><col className="w-[27%]" /><col className="w-[33%]" /><col className="w-1/5" /></colgroup>

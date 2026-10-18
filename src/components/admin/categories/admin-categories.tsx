@@ -264,7 +264,7 @@ export function AdminCategories() {
       {/* ------------------------------------------------------------------ */}
 
       <div className="overflow-x-auto rounded-2xl border border-border bg-card">
-        <div className="grid min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] border-border border-b bg-muted/60 px-4 py-3 font-semibold text-muted-foreground text-admin-14">
+        <div className="grid min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] lg:min-w-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)_100px_80px_70px] border-border border-b bg-muted/60 px-4 py-3 font-semibold text-muted-foreground text-admin-14">
           <div>Category Name</div>
 
           <div>Type</div>
@@ -320,7 +320,7 @@ function MainCategoryRow({
 
   return (
     <div>
-      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/10 px-4">
+      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] lg:min-w-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)_100px_80px_70px] items-center border-border border-b bg-primary/10 px-4">
         <div className="flex items-center gap-3">
           <Button
             type="button" variant="ghost" size="icon-sm"
@@ -413,7 +413,7 @@ function CategoryRow({
 
   return (
     <>
-      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/5 px-4">
+      <div className="grid min-h-[58px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] lg:min-w-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)_100px_80px_70px] items-center border-border border-b bg-primary/5 px-4">
         <div className="flex items-center gap-3 pl-8">
           <Button
             type="button" variant="ghost" size="icon-sm"
@@ -498,7 +498,7 @@ function SubcategoryRow({
   onRestore: (slug: string) => void;
 }) {
   return (
-    <div className="grid min-h-[56px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] items-center border-border border-b bg-primary/2 px-4">
+    <div className="grid min-h-[56px] min-w-[900px] grid-cols-[minmax(300px,1fr)_175px_140px_115px_90px] lg:min-w-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)_100px_80px_70px] items-center border-border border-b bg-primary/2 px-4">
       <div className="flex items-center gap-3 pl-[76px]">
         <span className="w-4 border-[#bfc3d5] border-t border-dashed" />
 

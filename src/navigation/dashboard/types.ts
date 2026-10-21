@@ -7,6 +7,8 @@ export type DashboardIconName =
   | "inquiries"
   | "categories"
   | "users"
+  | "plans"
+  | "billing"
   | "featured-companies"
   | "activity"
   | "analytics"

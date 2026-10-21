@@ -8,6 +8,7 @@ import {
   Building2,
   ChartNoAxesCombined,
   ClipboardCheck,
+  CreditCard,
   Heart,
   ImageIcon,
   Layers3,
@@ -15,6 +16,7 @@ import {
   MessagesSquare,
   Package,
   PackageCheck,
+  ReceiptText,
   Star,
   Users,
 } from "lucide-react";
@@ -56,6 +58,12 @@ function getIcon(iconName: DashboardIconName) {
 
     case "users":
       return Users;
+
+    case "plans":
+      return CreditCard;
+
+    case "billing":
+      return ReceiptText;
 
     case "featured-companies":
       return Star;

@@ -48,6 +48,19 @@ const navigationItems: DashboardNavGroup[] = [
         icon: "users",
       },
 
+      {
+        id: "plans",
+        title: "Manage Plans",
+        href: "/plans",
+        icon: "plans",
+      },
+      {
+        id: "billing",
+        title: "Billing",
+        href: "/billing",
+        icon: "billing",
+      },
+
       // {
       //   id: "featured-companies",
       //   title: "Featured Companies",

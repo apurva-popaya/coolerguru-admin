@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
+import { CompanyBilling } from "./_components/company-billing";
+
 import {
   CompanyDetail,
 } from "@/components/admin/company-detail/company-detail";
@@ -41,9 +43,10 @@ export default async function AdminCompanyDetailPage({
       );
 
     return (
-      <CompanyDetail
-        company={company}
-      />
+      <div className="flex min-w-0 flex-col gap-5">
+        <CompanyDetail company={company} />
+        <CompanyBilling companyId={company.id} />
+      </div>
     );
   } catch (error) {
     console.error(

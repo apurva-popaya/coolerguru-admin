@@ -108,7 +108,7 @@ export function createUsersColumns({
       id: "contact",
 
       header:
-        "Mobile",
+        "Contact",
 
       cell: ({ row }) => (
         <div className="min-w-0">
@@ -132,7 +132,7 @@ export function createUsersColumns({
         "Role",
 
       cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap justify-center gap-1">
           {row.original.roles.map(
             (role) => (
               <StatusBadge key={role} variant={roleVariant(role)}>
@@ -163,34 +163,6 @@ export function createUsersColumns({
         <StatusBadge variant={row.original.status === "Active" ? "success" : "danger"}>
           {row.original.status}
         </StatusBadge>
-      ),
-    },
-
-    {
-      accessorKey:
-        "joinedDate",
-
-      header:
-        "Joined",
-
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">
-          {row.original.joinedDate}
-        </span>
-      ),
-    },
-
-    {
-      accessorKey:
-        "lastActivity",
-
-      header:
-        "Last Activity",
-
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">
-          {row.original.lastActivity}
-        </span>
       ),
     },
 
